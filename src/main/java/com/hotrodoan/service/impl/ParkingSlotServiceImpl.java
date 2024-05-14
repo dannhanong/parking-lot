@@ -27,9 +27,4 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     public void deleteParkingSlot(Long id) {
 
     }
-
-    @Override
-    public ParkingSlot getParkingSlotByFloor(Floor floor) {
-        return null;
-    }
 }

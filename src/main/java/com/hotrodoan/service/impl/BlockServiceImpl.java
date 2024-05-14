@@ -23,7 +23,6 @@ public class BlockServiceImpl implements BlockService {
         return blockRepository.findById(id).map(bl -> {
             bl.setParkingLot(block.getParkingLot());
             bl.setBlockCode(block.getBlockCode());
-            bl.setNumberOfFloors(block.getNumberOfFloors());
             bl.setBlockFull(block.isBlockFull());
             return blockRepository.save(bl);
         }).orElseGet(() -> blockRepository.save(block));

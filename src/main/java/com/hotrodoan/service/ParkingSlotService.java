@@ -9,5 +9,4 @@ public interface ParkingSlotService {
     ParkingSlot addParkingSlot(ParkingSlot parkingSlot);
     ParkingSlot updateParkingSlot(ParkingSlot parkingSlot, Long id);
     void deleteParkingSlot(Long id);
-    ParkingSlot getParkingSlotByFloor(Floor floor);
 }

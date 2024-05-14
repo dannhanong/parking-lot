@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long>{
-    List<ParkingSlot> findByFloor(Floor floor);
 //    @Query("SELECT p FROM ParkingSlot p " +
 //            "WHERE p.slotAvailable = :slotAvailable " +
 //            "AND p.floor = :floor")
