@@ -49,8 +49,8 @@ public class ParkingLotServiceImpl implements ParkingLotService {
         return parkingLotRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking lot"));
     }
 
-    @Override
-    public List<Object[]> countUsedParkingSlots() {
-        return parkingLotRepository.countUsedParkingSlotsPerParkingLot();
-    }
+   @Override
+   public List<Object[]> countUsedParkingSlots() {
+       return null;
+   }
 }
