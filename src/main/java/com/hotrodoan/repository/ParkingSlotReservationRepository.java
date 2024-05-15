@@ -18,4 +18,6 @@ public interface ParkingSlotReservationRepository extends JpaRepository<ParkingS
     Page<ParkingSlotReservation> findByBookingDate(Date date, Pageable pageable);
     Page<ParkingSlotReservation> findByCustomerAndBookingDate(Customer customer, Date date, Pageable pageable);
     List<ParkingSlotReservation> findByParkingSlot(ParkingSlot parkingSlot);
+    @Query(value = "SELECT * FROM ParkingSlotReservation r WHERE DATE_ADD(r.startTimestamp, INTERVAL r.durationInMinutes MINUTE) < CURRENT_TIMESTAMP", nativeQuery = true)
+    List<ParkingSlotReservation> findPastReservations();
 }

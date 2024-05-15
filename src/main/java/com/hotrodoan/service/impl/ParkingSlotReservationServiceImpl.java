@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,4 +91,17 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
         return availableParkingSlots;
     }
 
+    @Override
+    public List<ParkingSlotReservation> findPastReservations() {
+        List<ParkingSlotReservation> allReservations = parkingSlotReservationRepository.findAll();
+
+        // Lọc ra những đặt chỗ đã kết thúc
+        List<ParkingSlotReservation> pastReservations = allReservations.stream()
+                .filter(reservation -> reservation.getStartTimestamp().toInstant()
+                        .plusMillis(reservation.getDurationInMinutes() * 60 * 1000)
+                        .isBefore(Instant.now()))
+                .collect(Collectors.toList());
+
+        return pastReservations;
+    }
 }
