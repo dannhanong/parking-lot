@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Date;
+import java.util.Calendar;
 
 @Entity
 @Data
@@ -17,11 +18,11 @@ public class RegularPass {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     private Date purchaseDate;
     private Date startDate;
+    private Date endDate;
     private int durationInDays;
     private int cost;
 }

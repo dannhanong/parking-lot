@@ -1,6 +1,7 @@
 package com.hotrodoan.controller;
 
 import com.hotrodoan.model.ParkingLot;
+import com.hotrodoan.model.ParkingLotDetails;
 import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.service.ParkingLotService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/parking-lots")
@@ -47,5 +50,21 @@ public class ParkingLotController {
     @GetMapping("/mana")
     public ResponseEntity<?> countUsedParkingSlots() {
         return new ResponseEntity<>(parkingLotService.countUsedParkingSlots(), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ParkingLotDetails> showParkingLot(@PathVariable Long id) {
+        ParkingLot parkingLot = parkingLotService.showParkingLot(id);
+        parkingLot.setUsedSlots(parkingLotService.countUsedParkingSlots(id));
+
+        List<ParkingLot> suggestions = parkingLotService.getParkingLotsByAddressAndReentryAllowedAndIdNot(parkingLot.getAddress(), parkingLot.isReentryAllowed(), id);
+        for (ParkingLot suggestion : suggestions) {
+            suggestion.setUsedSlots(parkingLotService.countUsedParkingSlots(suggestion.getId()));
+        }
+
+        ParkingLotDetails parkingLotDetails = new ParkingLotDetails();
+        parkingLotDetails.setParkingLot(parkingLot);
+        parkingLotDetails.setSuggestions(suggestions);
+        return new ResponseEntity<>(parkingLotDetails, HttpStatus.OK);
     }
 }

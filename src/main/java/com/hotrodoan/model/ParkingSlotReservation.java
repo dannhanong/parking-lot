@@ -18,7 +18,6 @@ public class ParkingSlotReservation {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "customer_id")
     private Customer customer;
 
     private Timestamp startTimestamp;
@@ -26,6 +25,5 @@ public class ParkingSlotReservation {
     private Date bookingDate;
 
     @ManyToOne
-    @JoinColumn(name = "parking_slot_id")
     private ParkingSlot parkingSlot;
 }

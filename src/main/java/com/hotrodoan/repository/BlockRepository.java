@@ -3,6 +3,7 @@ package com.hotrodoan.repository;
 import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingLot;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

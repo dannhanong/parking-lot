@@ -11,4 +11,5 @@ public interface BlockService {
     void deleteBlock(Long id);
     List<Block> getBlockByParkingLot(ParkingLot parkingLot);
     List<Block> getAllBlock();
+    Block getBlock(Long id);
 }

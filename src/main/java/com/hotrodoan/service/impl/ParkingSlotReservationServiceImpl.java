@@ -1,8 +1,6 @@
 package com.hotrodoan.service.impl;
 
-import com.hotrodoan.model.Customer;
-import com.hotrodoan.model.ParkingSlot;
-import com.hotrodoan.model.ParkingSlotReservation;
+import com.hotrodoan.model.*;
 import com.hotrodoan.repository.ParkingSlotReservationRepository;
 import com.hotrodoan.service.ParkingSlotReservationService;
 import com.hotrodoan.service.ParkingSlotService;
@@ -12,7 +10,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ParkingSlotReservationServiceImpl implements ParkingSlotReservationService {
@@ -20,12 +21,11 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     private ParkingSlotReservationRepository parkingSlotReservationRepository;
     @Autowired
     private ParkingSlotService parkingSlotService;
+    
 
     @Override
     public ParkingSlotReservation createParkingSlotReservation(ParkingSlotReservation parkingSlotReservation) {
-        ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
-        parkingSlot.setSlotAvailable(false);
-        parkingSlotService.updateParkingSlot(parkingSlot, parkingSlot.getId());
+        parkingSlotReservation.setBookingDate(new Date(System.currentTimeMillis()));
         return parkingSlotReservationRepository.save(parkingSlotReservation);
     }
 
@@ -64,4 +64,30 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     public List<ParkingSlot> findAvailableParkingSlots(int slotNumber, Date bookingDate, int durationInMinutes) {
         return null;
     }
+
+    @Override
+    public List<ParkingSlotReservation> getParkingSlotReservationsByParkingSlot(ParkingSlot parkingSlot) {
+        return parkingSlotReservationRepository.findByParkingSlot(parkingSlot);
+    }
+
+    @Override
+    public List<ParkingSlot> findAvailableParkingSlots(Timestamp startTimestamp, int durationInMinutes, Block block, ParkingLot parkingLot) {
+        List<ParkingSlot> allParkingSlots = parkingSlotService.getAllParkingSlots();
+        LocalDateTime startLocalDateTime = startTimestamp.toLocalDateTime();
+        // Lọc ra những ParkingSlot không có ParkingSlotReservation nào trùng thời gian
+        List<ParkingSlot> availableParkingSlots = allParkingSlots.stream()
+                .filter(parkingSlot -> parkingSlot.getBlock().equals(block) && parkingSlot.getBlock().getParkingLot().equals(parkingLot))
+                .filter(parkingSlot -> {
+                    List<ParkingSlotReservation> reservations = parkingSlotReservationRepository.findByParkingSlot(parkingSlot);
+                    return reservations.stream()
+                            .noneMatch(reservation -> {
+                                LocalDateTime reservationEnd = reservation.getStartTimestamp().toLocalDateTime().plusMinutes(reservation.getDurationInMinutes());
+                                LocalDateTime desiredEnd = startLocalDateTime.plusMinutes(durationInMinutes);
+                                return startLocalDateTime.isBefore(reservationEnd) && desiredEnd.isAfter(reservation.getStartTimestamp().toLocalDateTime());
+                            });
+                })
+                .collect(Collectors.toList());
+        return availableParkingSlots;
+    }
+
 }

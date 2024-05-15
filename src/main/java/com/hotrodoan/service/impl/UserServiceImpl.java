@@ -44,5 +44,13 @@ public class UserServiceImpl implements UserService {
     public Page<User> searchUserByKeyword(String keyword, Pageable pageable) {
         return userRepository.searchByKeyword(keyword, pageable);
     }
+
+    @Override
+    public User changePassword(User user, String newPassword) {
+        return userRepository.findById(user.getId()).map(u -> {
+            u.setPassword(newPassword);
+            return userRepository.save(u);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
 

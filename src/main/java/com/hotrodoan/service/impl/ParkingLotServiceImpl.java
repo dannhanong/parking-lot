@@ -22,7 +22,14 @@ public class ParkingLotServiceImpl implements ParkingLotService {
 
     @Override
     public Page<ParkingLot> getAllParkingLots(String keyword, Pageable pageable) {
-        return parkingLotRepository.findByKeyword(keyword, pageable);
+        Page<ParkingLot> parkingLots = parkingLotRepository.findByKeyword(keyword, pageable);
+
+        for (ParkingLot parkingLot : parkingLots) {
+            int usedSlots = parkingLotRepository.countUsedParkingSlots(parkingLot.getId());
+            parkingLot.setUsedSlots(usedSlots);
+        }
+
+        return parkingLots;
     }
 
     @Override
@@ -53,4 +60,19 @@ public class ParkingLotServiceImpl implements ParkingLotService {
    public List<Object[]> countUsedParkingSlots() {
        return null;
    }
+
+    @Override
+    public List<ParkingLot> getParkingLotsByAddressAndReentryAllowedAndIdNot(String address, boolean reentryAllowed, Long id) {
+        return parkingLotRepository.findByAddressAndReentryAllowedAndIdNot(address, reentryAllowed, id);
+    }
+
+    @Override
+    public ParkingLot showParkingLot(Long id) {
+        return parkingLotRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking lot"));
+    }
+
+    @Override
+    public int countUsedParkingSlots(Long id) {
+        return parkingLotRepository.countUsedParkingSlots(id);
+    }
 }

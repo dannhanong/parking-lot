@@ -24,4 +24,5 @@ public class ParkingLot {
     private boolean reentryAllowed;
     private String operatingCompanyName;
     private boolean valetParkingAvailable;
+    private int usedSlots = 0;
 }

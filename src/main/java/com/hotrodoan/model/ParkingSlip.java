@@ -22,8 +22,12 @@ public class ParkingSlip {
 
     private Timestamp actualEntryTime;
     private Timestamp actualExitTime;
-    private int basicCost;
+    @Column(nullable = true)
+    private int basicCost=0;
+    @Column(nullable = true)
     private int penalty=0;
-    private int totalCost;
-    private boolean paid;
+    @Column(nullable = true)
+    private int totalCost=0;
+    @Column(nullable = true)
+    private boolean paid=false;
 }

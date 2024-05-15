@@ -4,10 +4,7 @@ import com.hotrodoan.model.Customer;
 import com.hotrodoan.model.Role;
 import com.hotrodoan.model.RoleName;
 import com.hotrodoan.model.User;
-import com.hotrodoan.model.dto.JwtResponse;
-import com.hotrodoan.model.dto.LoginForm;
-import com.hotrodoan.model.dto.ResponseMessage;
-import com.hotrodoan.model.dto.SignupForm;
+import com.hotrodoan.model.dto.*;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.security.userdetail.CustomUserDetail;
@@ -116,7 +113,23 @@ public class AuthController {
             String token = jwtProvider.createToken(authentication);
             return ResponseEntity.ok(new JwtResponse(token, userDetail.getId(), userDetail.getName(), userDetail.getAuthorities(), userDetail.getAvatar()));
         }
-
-
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody ChangePasswordForm changePasswordForm){
+        String token = jwtTokenFilter.getJwt(request);
+        String username = jwtProvider.getUsernameFromToken(token);
+        User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        if(passwordEncoder.matches(changePasswordForm.getOldPassword(), user.getPassword())){
+            if(!changePasswordForm.getNewPassword().equals(changePasswordForm.getConfirmPassword())){
+                return new ResponseEntity<>(new ResponseMessage("confirm_password_not_match"), HttpStatus.OK);
+            }
+            user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
+            userService.save(user);
+            return new ResponseEntity<>(new ResponseMessage("change_password_success"), HttpStatus.OK);
+        }
+        return new ResponseEntity<>(new ResponseMessage("change_password_fail"), HttpStatus.OK);
+    }
+//        CustomUserDetail userDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        User user = userService.findByUsername(userDetail.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
 }

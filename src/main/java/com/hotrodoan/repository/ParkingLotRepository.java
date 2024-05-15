@@ -14,10 +14,17 @@ public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
     @Query("SELECT p FROM ParkingLot p WHERE CONCAT(p.address, ' ', p.zip, ' ', p.operatingCompanyName) LIKE %:keyword%")
     Page<ParkingLot> findByKeyword(String keyword, Pageable pageable);
 
-    // @Query("SELECT pl.address, COUNT(ps) FROM ParkingSlot ps " +
-    //         "JOIN f.block b " +
-    //         "JOIN b.parkingLot pl " +
-    //         "WHERE ps.slotAvailable = false " +
-    //         "GROUP BY pl.address")
+    List<ParkingLot> findByAddressAndReentryAllowedAndIdNot(String address, boolean reentryAllowed, Long id);
+    @Query("SELECT COUNT(ps) FROM ParkingSlot ps " +
+            "JOIN ps.block b " +
+            "JOIN b.parkingLot pl " +
+            "WHERE ps.slotAvailable = false AND pl.id = :id")
+    int countUsedParkingSlots(Long id);
+
+    // @Query("SELECT pl, COUNT(ps) FROM ParkingSlot ps " +
+    //     "JOIN ps.block b " +
+    //     "JOIN b.parkingLot pl " +
+    //     "WHERE ps.slotAvailable = false " +
+    //     "GROUP BY pl")
     // List<Object[]> countUsedParkingSlotsPerParkingLot();
 }

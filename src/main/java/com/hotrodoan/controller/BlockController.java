@@ -15,7 +15,7 @@ public class BlockController {
     @Autowired
     private BlockService blockService;
 
-    @GetMapping("")
+    @GetMapping("admin/all")
     public ResponseEntity<List<Block>> getBlocksByParkingLot() {
         return new ResponseEntity(blockService.getAllBlock(), HttpStatus.OK);
     }

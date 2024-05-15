@@ -25,4 +25,5 @@ public class Block {
     private String blockCode;
     @Column(nullable = true)
     private boolean blockFull = false;
+    private int usedParkingSlots = 0;
 }

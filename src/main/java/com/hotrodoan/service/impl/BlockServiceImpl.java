@@ -42,4 +42,9 @@ public class BlockServiceImpl implements BlockService {
     public List<Block> getAllBlock() {
         return blockRepository.findAll();
     }
+
+    @Override
+    public Block getBlock(Long id) {
+        return blockRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found block"));
+    }
 }

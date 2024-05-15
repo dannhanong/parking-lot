@@ -13,4 +13,7 @@ public interface ParkingLotService {
     void deleteParkingLot(Long id);
     ParkingLot getParkingLot(Long id);
     List<Object[]> countUsedParkingSlots();
+    List<ParkingLot> getParkingLotsByAddressAndReentryAllowedAndIdNot(String address, boolean reentryAllowed, Long id);
+    ParkingLot showParkingLot(Long id);
+    int countUsedParkingSlots(Long id);
 }
