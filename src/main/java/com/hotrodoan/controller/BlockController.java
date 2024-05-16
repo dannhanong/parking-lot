@@ -21,7 +21,7 @@ public class BlockController {
         return new ResponseEntity(blockService.getAllBlock(), HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("admin/add")
     public ResponseEntity<Block> createBlock(@RequestBody Block block) {
         return new ResponseEntity(blockService.createBlock(block), HttpStatus.CREATED);
     }
@@ -30,5 +30,10 @@ public class BlockController {
     public ResponseEntity deleteBlock(@PathVariable Long id) {
         blockService.deleteBlock(id);
         return new ResponseEntity(HttpStatus.OK);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Block> updateBlock(@RequestBody Block block, @PathVariable Long id) {
+        return new ResponseEntity(blockService.updateBlock(block, id), HttpStatus.OK);
     }
 }

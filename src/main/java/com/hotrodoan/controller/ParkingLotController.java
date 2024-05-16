@@ -42,7 +42,7 @@ public class ParkingLotController {
         return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("admin/delete/{id}")
     public ResponseEntity<ResponseMessage> deleteParkingLot(@PathVariable Long id) {
         parkingLotService.deleteParkingLot(id);
         return new ResponseEntity<>(new ResponseMessage("Deleted parking lot successfully"), HttpStatus.OK);
@@ -67,5 +67,10 @@ public class ParkingLotController {
         parkingLotDetails.setParkingLot(parkingLot);
         parkingLotDetails.setSuggestions(suggestions);
         return new ResponseEntity<>(parkingLotDetails, HttpStatus.OK);
+    }
+
+    @PutMapping("admin/update/{id}")
+    public ResponseEntity<ParkingLot> updateParkingLotAdmin(@RequestBody ParkingLot parkingLot, @PathVariable Long id) {
+        return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
     }
 }

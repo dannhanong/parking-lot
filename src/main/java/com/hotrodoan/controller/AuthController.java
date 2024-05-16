@@ -113,27 +113,27 @@ public class AuthController {
             }
         } catch (BadCredentialsException ex) {
             if (userService.findByUsername(loginForm.getUsername()).isPresent()) {
-                return new ResponseEntity<>(new ResponseMessage("wrong_password"), HttpStatus.OK);
+                return new ResponseEntity<>(new ResponseMessage("wrong_password"), HttpStatus.UNAUTHORIZED);
             } else {
-                return new ResponseEntity<>(new ResponseMessage("username_not_exists"), HttpStatus.OK);
+                return new ResponseEntity<>(new ResponseMessage("username_not_exists"), HttpStatus.UNAUTHORIZED);
             }
         }
     }
 
-    @PostMapping("/change-password")
+    @PutMapping("/change-password")
     public ResponseEntity<?> changePassword(HttpServletRequest request, @RequestBody ChangePasswordForm changePasswordForm){
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         if(passwordEncoder.matches(changePasswordForm.getOldPassword(), user.getPassword())){
             if(!changePasswordForm.getNewPassword().equals(changePasswordForm.getConfirmPassword())){
-                return new ResponseEntity<>(new ResponseMessage("confirm_password_not_match"), HttpStatus.OK);
+                return new ResponseEntity<>(new ResponseMessage("confirm_password_not_match"), HttpStatus.BAD_REQUEST);
             }
             user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
             userService.save(user);
             return new ResponseEntity<>(new ResponseMessage("change_password_success"), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new ResponseMessage("change_password_fail"), HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("change_password_fail"), HttpStatus.UNAUTHORIZED);
     }
 //        CustomUserDetail userDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        User user = userService.findByUsername(userDetail.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
