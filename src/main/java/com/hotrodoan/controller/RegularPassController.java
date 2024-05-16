@@ -11,6 +11,8 @@ import com.hotrodoan.service.RegularPassService;
 import com.hotrodoan.service.UserService;
 import com.hotrodoan.service.VNPayService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +21,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.sql.Date;
 import java.util.Calendar;
-import java.util.List;
 
 @RestController
 @RequestMapping("/regular-passes")
@@ -66,7 +68,7 @@ public class RegularPassController {
     }
 
     @PostMapping("/add")
-    public String addRegularPass(HttpServletRequest request, @RequestBody RegularPass regularPass) {
+    public RedirectView addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -76,9 +78,10 @@ public class RegularPassController {
         int duration = regularPass.getDurationInDays();
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
         String vnpayUrl = vnPayService.createOrder(totalPrice, "Pay for "+duration+" day", baseUrl);
-        regularPassService.addRegularPass(regularPass);
+        session.setAttribute("regularPass", regularPass);
+        // regularPassService.addRegularPass(regularPass);
 //        return new ResponseEntity<>(regularPassService.addRegularPass(regularPass), HttpStatus.CREATED);
-        return vnpayUrl;
+        return new RedirectView(vnpayUrl);
     }
 
     @PutMapping("renew")

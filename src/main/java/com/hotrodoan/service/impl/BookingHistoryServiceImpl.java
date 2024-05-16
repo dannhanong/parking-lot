@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookingHistoryServiceImpl implements BookingHistoryService {
     @Autowired
@@ -31,5 +33,10 @@ public class BookingHistoryServiceImpl implements BookingHistoryService {
     @Override
     public Page<BookingHistory> getBookingHistoriesByCustomer(Customer customer, Pageable pageable) {
         return bookingHistoryRepository.findByCustomer(customer, pageable);
+    }
+
+    @Override
+    public void addBookingHistories(List<BookingHistory> histories) {
+        bookingHistoryRepository.saveAll(histories);
     }
 }

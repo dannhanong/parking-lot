@@ -1,6 +1,8 @@
 package com.hotrodoan.controller;
 
+import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.VnPayPayment;
+import com.hotrodoan.service.RegularPassService;
 import com.hotrodoan.service.VNPayService;
 import com.hotrodoan.service.VnPayPaymentService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,6 +25,9 @@ public class Controller {
     @Autowired
     private VnPayPaymentService vnPayPaymentService;
 
+    @Autowired
+    private RegularPassService regularPassService;
+
 //    @Autowired
 //    private Member_PackageService member_packageService;
 
@@ -42,12 +47,12 @@ public class Controller {
     }
 
     @GetMapping("/vnpay-payment")
-    public String GetMapping(HttpServletRequest request, Model model){
+    public String GetMapping(HttpServletRequest request, Model model, HttpSession session){
         int paymentStatus =vnPayService.orderReturn(request);
 
 //        Object obj = request.getSession().getAttribute("m_p");
 //        Member_Package m_p = (Member_Package) obj;
-        HttpSession session = request.getSession();
+        // HttpSession session = request.getSession();
 //        Member_Package m_p = (Member_Package) session.getAttribute("m_p");
 
         String orderInfo = request.getParameter("vnp_OrderInfo");
@@ -75,7 +80,8 @@ public class Controller {
         }
 
         if (paymentStatus == 1){
-//            member_packageService.addMember_Package(m_p);
+            RegularPass regularPass = (RegularPass) session.getAttribute("regularPass");
+            regularPassService.addRegularPass(regularPass);
             return "ordersuccess";
         }else
             return "orderfail";

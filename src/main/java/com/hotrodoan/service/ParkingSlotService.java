@@ -17,4 +17,5 @@ public interface ParkingSlotService {
     ParkingSlot getParkingSlot(Long id);
     int countUsedParkingSlots(Long id);
     List<ParkingSlot> getAllParkingSlots();
+    void updateParkingSlots(List<ParkingSlot> parkingSlots);
 }

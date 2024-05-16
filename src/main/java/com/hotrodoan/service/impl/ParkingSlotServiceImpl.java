@@ -60,4 +60,9 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     public List<ParkingSlot> getAllParkingSlots() {
         return parkingSlotRepository.findAll();
     }
+
+    @Override
+    public void updateParkingSlots(List<ParkingSlot> parkingSlots) {
+        parkingSlotRepository.saveAll(parkingSlots);
+    }
 }

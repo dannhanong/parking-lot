@@ -1,6 +1,7 @@
 package com.hotrodoan.service;
 
 import com.hotrodoan.config.VNPayConfig;
+import com.hotrodoan.model.RegularPass;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 
@@ -116,5 +117,4 @@ public class VNPayService {
             return -1;
         }
     }
-
 }
