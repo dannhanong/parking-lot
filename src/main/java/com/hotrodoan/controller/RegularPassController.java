@@ -28,6 +28,7 @@ import java.util.Calendar;
 
 @RestController
 @RequestMapping("/regular-passes")
+@CrossOrigin(origins = "*")
 public class RegularPassController {
     @Autowired
     private RegularPassService regularPassService;

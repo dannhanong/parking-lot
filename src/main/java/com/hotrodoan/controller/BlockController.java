@@ -11,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/blocks")
+@CrossOrigin(origins = "*")
 public class BlockController {
     @Autowired
     private BlockService blockService;

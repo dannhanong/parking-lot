@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/parking-slips")
+@CrossOrigin(origins = "*")
 public class ParkingSlipController {
     @Autowired
     private ParkingSlipService parkingSlipService;

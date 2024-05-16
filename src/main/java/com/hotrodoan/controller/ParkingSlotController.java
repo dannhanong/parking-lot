@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/parking-slots")
+@CrossOrigin(origins = "*")
 public class ParkingSlotController {
     @Autowired
     private ParkingSlotService parkingSlotService;

@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -96,22 +97,26 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginForm loginForm){
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword())
-        );
-
-        // Lấy thông tin người dùng từ Principal
-        CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
-//        System.out.println(userDetail.getAuthorities());
-
-        // Kiểm tra trạng thái enabled của người dùng
-        if (!userDetail.isEnabled()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("User is not enabled. Please contact administrator.");
-        }else {
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            String token = jwtProvider.createToken(authentication);
-            return ResponseEntity.ok(new JwtResponse(token, userDetail.getId(), userDetail.getName(), userDetail.getAuthorities(), userDetail.getAvatar()));
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginForm.getUsername(), loginForm.getPassword())
+            );
+            // Lấy thông tin người dùng từ Principal
+            CustomUserDetail userDetail = (CustomUserDetail) authentication.getPrincipal();
+            if (!userDetail.isEnabled()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body("User is not enabled. Please contact administrator.");
+            } else {
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                String token = jwtProvider.createToken(authentication);
+                return ResponseEntity.ok(new JwtResponse(token, userDetail.getId(), userDetail.getName(), userDetail.getAuthorities(), userDetail.getAvatar()));
+            }
+        } catch (BadCredentialsException ex) {
+            if (userService.findByUsername(loginForm.getUsername()).isPresent()) {
+                return new ResponseEntity<>(new ResponseMessage("wrong_password"), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new ResponseMessage("username_not_exists"), HttpStatus.OK);
+            }
         }
     }
 
