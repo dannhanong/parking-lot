@@ -86,15 +86,24 @@ public class ParkingSlotReservationController {
         ParkingSlotReservation newParkingSlotReservation = parkingSlotReservationService.createParkingSlotReservation(parkingSlotReservation);
 
         ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
-        Long parkingSlotId = parkingSlot.getId();
-        parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
-        parkingSlot.setSlotAvailable(false);
-        parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
 
-        ParkingSlip parkingSlip = new ParkingSlip();
-        parkingSlip.setParkingSlotReservation(newParkingSlotReservation);
-        parkingSlipService.createParkingSlip(parkingSlip);
-        return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
+        if(!isParkingSlotAvailable(parkingSlot)) {
+            throw new RuntimeException("Parking slot is not available");
+        }else{
+            Long parkingSlotId = parkingSlot.getId();
+            parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
+            parkingSlot.setSlotAvailable(false);
+            parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
+
+            ParkingSlip parkingSlip = new ParkingSlip();
+            parkingSlip.setParkingSlotReservation(newParkingSlotReservation);
+            parkingSlipService.createParkingSlip(parkingSlip);
+            return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
+        }     
+    }
+
+    public boolean isParkingSlotAvailable(ParkingSlot parkingSlot) {
+        return parkingSlot.isSlotAvailable();
     }
 
     @PutMapping("/update/{id}")
