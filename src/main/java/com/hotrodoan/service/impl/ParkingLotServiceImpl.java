@@ -35,6 +35,7 @@ public class ParkingLotServiceImpl implements ParkingLotService {
     @Override
     public ParkingLot updateParkingLot(ParkingLot parkingLot, Long id) {
         return parkingLotRepository.findById(id).map(pl -> {
+            pl.setName(parkingLot.getName());
             pl.setNumberOfBlocks(parkingLot.getNumberOfBlocks());
             pl.setSlotAvailable(parkingLot.isSlotAvailable());
             pl.setAddress(parkingLot.getAddress());

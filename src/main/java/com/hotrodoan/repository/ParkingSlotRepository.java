@@ -21,4 +21,7 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long>{
     @Query("SELECT COUNT(ps) FROM ParkingSlot ps " +
             "WHERE ps.block.id = :id AND ps.slotAvailable = false")
     int countUsedParkingSlots(Long id);
+
+    @Query("SELECT MAX(p.slotNumber) FROM ParkingSlot p")
+    Integer findMaxSlotNumber();
 }

@@ -65,4 +65,9 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     public void updateParkingSlots(List<ParkingSlot> parkingSlots) {
         parkingSlotRepository.saveAll(parkingSlots);
     }
+
+    @Override
+    public int findMaxSlotNumber() {
+        return parkingSlotRepository.findMaxSlotNumber();
+    }
 }

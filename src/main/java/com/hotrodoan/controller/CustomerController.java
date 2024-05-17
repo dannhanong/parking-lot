@@ -40,7 +40,7 @@ public class CustomerController {
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping("admin/add")
     public ResponseEntity<Customer> addCustomer(@RequestBody Customer customer) {
         return new ResponseEntity<>(customerService.addCustomer(customer), HttpStatus.OK);
     }
@@ -59,7 +59,7 @@ public class CustomerController {
         return new ResponseEntity<>(customerService.updateCustomer(customer1, customer1.getId()), HttpStatus.OK);
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("admin/delete/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable("id") Long id) {
         customerService.deleteCustomer(id);
         return new ResponseEntity<>(new ResponseMessage("deleted"), HttpStatus.OK);

@@ -1,30 +1,24 @@
-package com.hotrodoan.model;
+package com.hotrodoan.model.dto;
 
-import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParkingLot {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    private String name;
-    @Min(1)
-    private int numberOfBlocks;
-    private boolean slotAvailable;
+public class ParkingLotAndBlockForm {
     private String address;
     @Size(min = 5, max = 10)
     private String zip;
     private boolean reentryAllowed;
     private String operatingCompanyName;
     private boolean valetParkingAvailable;
-    @Column(nullable = true)
-    private int usedSlots = 0;
+
+    @NotBlank(message = "Block code is required")
+    @Size(min = 1, max = 3)
+    private String blockCode;
 }

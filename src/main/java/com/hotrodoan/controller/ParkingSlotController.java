@@ -2,6 +2,7 @@ package com.hotrodoan.controller;
 
 import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingSlot;
+import com.hotrodoan.model.dto.CreateParkingSlotForm;
 import com.hotrodoan.service.ParkingSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,17 +23,23 @@ public class ParkingSlotController {
         return ResponseEntity.ok(parkingSlotService.getParkingSlotByBlock(block));
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ParkingSlot> addParkingSlot(@RequestBody ParkingSlot parkingSlot) {
-        return new  ResponseEntity<>(parkingSlotService.addParkingSlot(parkingSlot), HttpStatus.CREATED);
+    @PostMapping("/admin/add")
+    public ResponseEntity<ParkingSlot> addParkingSlot(@RequestBody CreateParkingSlotForm createParkingSlotForm) {
+        ParkingSlot parkingSlot = new ParkingSlot();
+        parkingSlot.setBlock(createParkingSlotForm.getBlock());
+        int maxOfSlot = parkingSlotService.findMaxSlotNumber();
+        for (int i = 0; i < createParkingSlotForm.getWantManySlots(); i++) {
+            parkingSlot.setSlotNumber(maxOfSlot+i+1);
+        }
+        return new ResponseEntity<>(parkingSlotService.addParkingSlot(parkingSlot), HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping("/admin/update/{id}")
     public ResponseEntity<ParkingSlot> updateParkingSlot(@RequestBody ParkingSlot parkingSlot, @PathVariable Long id) {
         return ResponseEntity.ok(parkingSlotService.updateParkingSlot(parkingSlot, id));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<Void> deleteParkingSlot(@PathVariable Long id) {
         parkingSlotService.deleteParkingSlot(id);
         return ResponseEntity.ok().build();

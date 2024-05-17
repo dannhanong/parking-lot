@@ -23,6 +23,7 @@ public class Block {
     @NotBlank(message = "Block code is required")
     @Size(min = 1, max = 3)
     private String blockCode;
+    private int numberOfParkingSlots = 0;
     @Column(nullable = true)
     private boolean blockFull = false;
     private int usedParkingSlots = 0;

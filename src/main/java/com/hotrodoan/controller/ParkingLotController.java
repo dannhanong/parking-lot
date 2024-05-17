@@ -1,8 +1,11 @@
 package com.hotrodoan.controller;
 
+import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingLot;
 import com.hotrodoan.model.ParkingLotDetails;
+import com.hotrodoan.model.dto.ParkingLotAndBlockForm;
 import com.hotrodoan.model.dto.ResponseMessage;
+import com.hotrodoan.service.BlockService;
 import com.hotrodoan.service.ParkingLotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,6 +24,8 @@ import java.util.List;
 public class ParkingLotController {
     @Autowired
     private ParkingLotService parkingLotService;
+    @Autowired
+    private BlockService blockService;
 
     @GetMapping("")
     public ResponseEntity<Page<ParkingLot>> getAllParkingLots(@RequestParam(defaultValue = "") String keyword,
@@ -32,26 +37,40 @@ public class ParkingLotController {
         return new ResponseEntity<>(parkingLotService.getAllParkingLots(keyword, pageable), HttpStatus.OK);
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<ParkingLot> createParkingLot(@RequestBody ParkingLot parkingLot) {
-        return new ResponseEntity<>(parkingLotService.createParkingLot(parkingLot), HttpStatus.OK);
+    @PostMapping("/admin/add")
+    public ResponseEntity<ParkingLot> createParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm) {
+        ParkingLot parkingLot = new ParkingLot();
+        Block block = new Block();
+        parkingLot.setNumberOfBlocks(1);
+        parkingLot.setSlotAvailable(true);
+        parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
+        parkingLot.setZip(parkingLotAndBlockForm.getZip());
+        parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
+        parkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
+        parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
+
+        ParkingLot newParkingLot = parkingLotService.createParkingLot(parkingLot);
+        block.setParkingLot(newParkingLot);
+        block.setBlockCode(parkingLotAndBlockForm.getBlockCode());
+        blockService.createBlock(block);
+        return new ResponseEntity<>(newParkingLot, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/admin/update/{id}")
     public ResponseEntity<ParkingLot> updateParkingLot(@RequestBody ParkingLot parkingLot, @PathVariable Long id) {
         return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
     }
 
-    @DeleteMapping("admin/delete/{id}")
+    @DeleteMapping("/admin/delete/{id}")
     public ResponseEntity<ResponseMessage> deleteParkingLot(@PathVariable Long id) {
         parkingLotService.deleteParkingLot(id);
         return new ResponseEntity<>(new ResponseMessage("Deleted parking lot successfully"), HttpStatus.OK);
     }
 
-    @GetMapping("/mana")
-    public ResponseEntity<?> countUsedParkingSlots() {
-        return new ResponseEntity<>(parkingLotService.countUsedParkingSlots(), HttpStatus.OK);
-    }
+//    @GetMapping("/mana")
+//    public ResponseEntity<?> countUsedParkingSlots() {
+//        return new ResponseEntity<>(parkingLotService.countUsedParkingSlots(), HttpStatus.OK);
+//    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ParkingLotDetails> showParkingLot(@PathVariable Long id) {
@@ -68,9 +87,9 @@ public class ParkingLotController {
         parkingLotDetails.setSuggestions(suggestions);
         return new ResponseEntity<>(parkingLotDetails, HttpStatus.OK);
     }
-
-    @PutMapping("admin/update/{id}")
-    public ResponseEntity<ParkingLot> updateParkingLotAdmin(@RequestBody ParkingLot parkingLot, @PathVariable Long id) {
-        return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
-    }
+//
+//    @PutMapping("admin/update/{id}")
+//    public ResponseEntity<ParkingLot> updateParkingLotAdmin(@RequestBody ParkingLot parkingLot, @PathVariable Long id) {
+//        return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
+//    }
 }
