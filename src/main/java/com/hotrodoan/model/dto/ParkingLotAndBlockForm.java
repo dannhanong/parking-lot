@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ParkingLotAndBlockForm {
+    private String name;
     private String address;
     @Size(min = 5, max = 10)
     private String zip;
@@ -20,5 +21,5 @@ public class ParkingLotAndBlockForm {
 
     @NotBlank(message = "Block code is required")
     @Size(min = 1, max = 3)
-    private String blockCode;
+    private String[] blockCode;
 }

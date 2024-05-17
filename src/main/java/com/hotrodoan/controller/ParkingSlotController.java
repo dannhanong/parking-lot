@@ -27,6 +27,7 @@ public class ParkingSlotController {
     public ResponseEntity<ParkingSlot> addParkingSlot(@RequestBody CreateParkingSlotForm createParkingSlotForm) {
         ParkingSlot parkingSlot = new ParkingSlot();
         parkingSlot.setBlock(createParkingSlotForm.getBlock());
+        
         int maxOfSlot = parkingSlotService.findMaxSlotNumber();
         for (int i = 0; i < createParkingSlotForm.getWantManySlots(); i++) {
             parkingSlot.setSlotNumber(maxOfSlot+i+1);

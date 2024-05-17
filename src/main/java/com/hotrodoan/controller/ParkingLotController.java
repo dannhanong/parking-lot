@@ -43,6 +43,7 @@ public class ParkingLotController {
         Block block = new Block();
         parkingLot.setNumberOfBlocks(1);
         parkingLot.setSlotAvailable(true);
+        parkingLot.setName(parkingLotAndBlockForm.getName());
         parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
         parkingLot.setZip(parkingLotAndBlockForm.getZip());
         parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
@@ -50,9 +51,13 @@ public class ParkingLotController {
         parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
 
         ParkingLot newParkingLot = parkingLotService.createParkingLot(parkingLot);
-        block.setParkingLot(newParkingLot);
-        block.setBlockCode(parkingLotAndBlockForm.getBlockCode());
-        blockService.createBlock(block);
+
+        for (String blockCode : parkingLotAndBlockForm.getBlockCode()) {
+            Block bl = new Block();
+            bl.setBlockCode(blockCode);
+            bl.setParkingLot(newParkingLot);
+            blockService.createBlock(bl);
+        }
         return new ResponseEntity<>(newParkingLot, HttpStatus.OK);
     }
 
