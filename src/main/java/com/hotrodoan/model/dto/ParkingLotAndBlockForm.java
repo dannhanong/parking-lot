@@ -21,5 +21,5 @@ public class ParkingLotAndBlockForm {
 
     @NotBlank(message = "Block code is required")
     @Size(min = 1, max = 3)
-    private String[] blockCode;
+    private BlockAndParkingSlot[] blockAndParkingSlots;
 }

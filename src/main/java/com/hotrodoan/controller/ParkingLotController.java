@@ -3,10 +3,13 @@ package com.hotrodoan.controller;
 import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingLot;
 import com.hotrodoan.model.ParkingLotDetails;
+import com.hotrodoan.model.ParkingSlot;
+import com.hotrodoan.model.dto.BlockAndParkingSlot;
 import com.hotrodoan.model.dto.ParkingLotAndBlockForm;
 import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.service.BlockService;
 import com.hotrodoan.service.ParkingLotService;
+import com.hotrodoan.service.ParkingSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +29,8 @@ public class ParkingLotController {
     private ParkingLotService parkingLotService;
     @Autowired
     private BlockService blockService;
+    @Autowired
+    private ParkingSlotService parkingSlotService;
 
     @GetMapping("")
     public ResponseEntity<Page<ParkingLot>> getAllParkingLots(@RequestParam(defaultValue = "") String keyword,
@@ -52,12 +57,21 @@ public class ParkingLotController {
 
         ParkingLot newParkingLot = parkingLotService.createParkingLot(parkingLot);
 
-        for (String blockCode : parkingLotAndBlockForm.getBlockCode()) {
+        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
             Block bl = new Block();
-            bl.setBlockCode(blockCode);
+            bl.setBlockCode(blockAndParkingSlot.getBlockCode());
             bl.setParkingLot(newParkingLot);
-            blockService.createBlock(bl);
+            Block newBlock = blockService.createBlock(bl);
+
+            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+            for (int i = 0; i < numberOfSlots; i++) {
+                ParkingSlot parkingSlot = new ParkingSlot();
+                parkingSlot.setBlock(newBlock);
+                parkingSlot.setSlotNumber(i + 1);
+                parkingSlotService.addParkingSlot(parkingSlot);
+            }
         }
+
         return new ResponseEntity<>(newParkingLot, HttpStatus.OK);
     }
 
