@@ -53,7 +53,7 @@ public class BookingScheduler {
             history.setActualEntryTime(parkingSlip.getActualEntryTime());
             history.setActualExitTime(parkingSlip.getActualExitTime());
             history.setBasicCost(parkingSlip.getBasicCost());
-            history.setPenalty(parkingSlip.getPenalty());
+//            history.setPenalty(parkingSlip.getPenalty());
             history.setTotalCost(parkingSlip.getTotalCost());
             history.setPaid(parkingSlip.isPaid());
 

@@ -1,14 +1,12 @@
 package com.hotrodoan.controller;
 
-import com.hotrodoan.model.Customer;
-import com.hotrodoan.model.Role;
-import com.hotrodoan.model.RoleName;
-import com.hotrodoan.model.User;
+import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.*;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.security.userdetail.CustomUserDetail;
 import com.hotrodoan.service.CustomerService;
+import com.hotrodoan.service.RegularPassService;
 import com.hotrodoan.service.RoleService;
 import com.hotrodoan.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -29,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @RestController
+@RequestMapping("/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
     @Autowired
@@ -51,6 +50,9 @@ public class AuthController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private RegularPassService regularPassService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignupForm signupForm, HttpServletRequest request) {
@@ -137,4 +139,17 @@ public class AuthController {
     }
 //        CustomUserDetail userDetail = (CustomUserDetail) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        User user = userService.findByUsername(userDetail.getUsername()).orElseThrow(() -> new RuntimeException("User not found"));
+
+    @GetMapping("/profile")
+    public ResponseEntity<CustomerAndRegularPass> getProfile(HttpServletRequest request) {
+        String token = jwtTokenFilter.getJwt(request);
+        String username = jwtProvider.getUsernameFromToken(token);
+        User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Customer customer = customerService.getCustomerByUser(user);
+        RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
+        CustomerAndRegularPass customerAndRegularPass = new CustomerAndRegularPass();
+        customerAndRegularPass.setCustomer(customer);
+        customerAndRegularPass.setRegularPass(regularPass);
+        return new ResponseEntity<>(customerAndRegularPass, HttpStatus.OK);
+    }
 }

@@ -2,9 +2,12 @@ package com.hotrodoan.controller;
 
 import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingLot;
+import com.hotrodoan.model.ParkingSlot;
+import com.hotrodoan.model.dto.BlockAndParkingSlot;
 import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.service.BlockService;
 import com.hotrodoan.service.ParkingLotService;
+import com.hotrodoan.service.ParkingSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,14 +23,28 @@ public class BlockController {
     private BlockService blockService;
     @Autowired
     private ParkingLotService parkingLotService;
+    @Autowired
+    private ParkingSlotService parkingSlotService;
 
     @GetMapping("admin/all")
     public ResponseEntity<List<Block>> getBlocksByParkingLot() {
         return new ResponseEntity(blockService.getAllBlock(), HttpStatus.OK);
     }
 
-    @PostMapping("admin/add")
-    public ResponseEntity<Block> createBlock(@RequestBody Block block) {
+    @PostMapping("admin/add/{id}")
+    public ResponseEntity<Block> createBlock(@RequestBody BlockAndParkingSlot blockAndParkingSlot, @PathVariable Long id) {
+        ParkingLot parkingLot = parkingLotService.getParkingLot(id);
+        Block block = new Block();
+        block.setParkingLot(parkingLot);
+        block.setBlockCode(blockAndParkingSlot.getBlockCode());
+        Block newBlock = blockService.createBlock(block);
+        int numberOfParkingSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+        for (int i=0; i<numberOfParkingSlots; i++) {
+            ParkingSlot parkingSlot = new ParkingSlot();
+            parkingSlot.setBlock(newBlock);
+            parkingSlot.setSlotNumber(i+1);
+            parkingSlotService.addParkingSlot(parkingSlot);
+        }
         return new ResponseEntity(blockService.createBlock(block), HttpStatus.CREATED);
     }
 

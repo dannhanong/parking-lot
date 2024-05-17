@@ -31,7 +31,7 @@ public class ParkingSlipServiceImpl implements ParkingSlipService {
             ps.setActualEntryTime(parkingSlip.getActualEntryTime());
             ps.setActualExitTime(parkingSlip.getActualExitTime());
             ps.setBasicCost(parkingSlip.getBasicCost());
-            ps.setPenalty(parkingSlip.getPenalty());
+//            ps.setPenalty(parkingSlip.getPenalty());
             ps.setTotalCost(parkingSlip.getTotalCost());
             ps.setPaid(parkingSlip.isPaid());
             return parkingSlipRepository.save(ps);
