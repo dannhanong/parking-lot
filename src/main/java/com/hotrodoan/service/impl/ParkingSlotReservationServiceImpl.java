@@ -3,9 +3,12 @@ package com.hotrodoan.service.impl;
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
 import com.hotrodoan.repository.ParkingSlotReservationRepository;
+import com.hotrodoan.service.BlockService;
+import com.hotrodoan.service.ParkingLotService;
 import com.hotrodoan.service.ParkingSlotReservationService;
 import com.hotrodoan.service.ParkingSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ansi.Ansi8BitColor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,10 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     private ParkingSlotReservationRepository parkingSlotReservationRepository;
     @Autowired
     private ParkingSlotService parkingSlotService;
+    @Autowired
+    private ParkingLotService parkingLotService;
+    @Autowired
+    private BlockService blockService;
 
     @Override
     public ParkingSlotReservation createParkingSlotReservation(ParkingSlotReservation parkingSlotReservation) {
@@ -75,8 +82,16 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     }
 
     @Override
-    public List<AvailableParkingSlotsInfo> findAvailableParkingSlotsAndBlockAndParkingLot(Timestamp startTimestamp, int durationInMinutes) {
-        List<ParkingSlot> allParkingSlots = parkingSlotService.getAllParkingSlots();
+    public List<AvailableParkingSlotsInfo> findAvailableParkingSlotsAndBlockAndParkingLot(Timestamp startTimestamp, int durationInMinutes, Long id) {
+        ParkingLot parkingLot = parkingLotService.getParkingLot(id);
+        List<Block> allBlocks = blockService.getBlockByParkingLot(parkingLot);
+        List<ParkingSlot> allParkingSlots = new ArrayList<>();
+
+        for (Block block : allBlocks) {
+            List<ParkingSlot> parkingSlots = parkingSlotService.getParkingSlotByBlock(block);
+            allParkingSlots.addAll(parkingSlots);
+        }
+
         LocalDateTime startLocalDateTime = startTimestamp.toLocalDateTime();
 
         Map<Block, List<ParkingSlot>> availableSlotsByBlock = allParkingSlots.stream()

@@ -68,9 +68,10 @@ public class ParkingSlotReservationController {
 
     @GetMapping("/add")
     public ResponseEntity<List<AvailableParkingSlotsInfo>> getAllParkingSlotAvailable(@RequestParam("startTimestamp") String startTimestampStr,
-                                                                                      @RequestParam("durationInMinutes") int durationInMinutes) {
+                                                                                      @RequestParam("durationInMinutes") int durationInMinutes,
+                                                                                      @RequestParam("id") Long id) {
         Timestamp startTimestamp = Timestamp.valueOf(startTimestampStr);
-        return new ResponseEntity<>(parkingSlotReservationService.findAvailableParkingSlotsAndBlockAndParkingLot(startTimestamp, durationInMinutes), HttpStatus.OK);
+        return new ResponseEntity<>(parkingSlotReservationService.findAvailableParkingSlotsAndBlockAndParkingLot(startTimestamp, durationInMinutes, id), HttpStatus.OK);
     }
 
     @PostMapping("/add")

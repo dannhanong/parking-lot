@@ -12,4 +12,5 @@ public interface BlockService {
     List<Block> getBlockByParkingLot(ParkingLot parkingLot);
     List<Block> getAllBlock();
     Block getBlock(Long id);
+    Block getBlockByParkingLotAndBlockCode(ParkingLot parkingLot, String blockCode);
 }

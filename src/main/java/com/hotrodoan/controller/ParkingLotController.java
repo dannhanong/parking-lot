@@ -46,11 +46,9 @@ public class ParkingLotController {
     public ResponseEntity<ParkingLotAndBlockForm> createParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm) {
         ParkingLot parkingLot = new ParkingLot();
         Block block = new Block();
-        parkingLot.setNumberOfBlocks(1);
         parkingLot.setSlotAvailable(true);
         parkingLot.setName(parkingLotAndBlockForm.getName());
         parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
-        parkingLot.setZip(parkingLotAndBlockForm.getZip());
         parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
         parkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
         parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
@@ -85,8 +83,43 @@ public class ParkingLotController {
     }
 
     @PutMapping("/admin/update/{id}")
-    public ResponseEntity<ParkingLot> updateParkingLot(@RequestBody ParkingLot parkingLot, @PathVariable Long id) {
-        return new ResponseEntity<>(parkingLotService.updateParkingLot(parkingLot, id), HttpStatus.OK);
+    public ResponseEntity<ParkingLotAndBlockForm> updateParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm, @PathVariable Long id) {
+        ParkingLot parkingLot = new ParkingLot();
+        Block block = new Block();
+        parkingLot.setSlotAvailable(true);
+        parkingLot.setName(parkingLotAndBlockForm.getName());
+        parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
+        parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
+        parkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
+        parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
+
+        ParkingLot updateParkingLot = parkingLotService.updateParkingLot(parkingLot, id);
+
+        int dBlock = 0;
+
+        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
+            Block bl = blockService.getBlockByParkingLotAndBlockCode(updateParkingLot, blockAndParkingSlot.getBlockCode());
+            bl.setBlockCode(blockAndParkingSlot.getBlockCode());
+            dBlock += 1;
+            int dParkingSlot = 0;
+            Block newBlock = blockService.createBlock(bl);
+
+            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+            for (int i = 0; i < numberOfSlots; i++) {
+                dParkingSlot += 1;
+                ParkingSlot parkingSlot = new ParkingSlot();
+                parkingSlot.setBlock(newBlock);
+                parkingSlot.setSlotNumber(i + 1);
+                parkingSlotService.addParkingSlot(parkingSlot);
+            }
+            newBlock.setNumberOfParkingSlots(dParkingSlot);
+            blockService.updateBlock(newBlock, newBlock.getId());
+        }
+
+//        newParkingLot.setNumberOfBlocks(dBlock);
+//        parkingLotService.updateParkingLot(newParkingLot, newParkingLot.getId());
+
+        return new ResponseEntity<>(parkingLotAndBlockForm, HttpStatus.OK);
     }
 
     @DeleteMapping("/admin/delete/{id}")

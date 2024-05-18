@@ -48,4 +48,9 @@ public class BlockServiceImpl implements BlockService {
     public Block getBlock(Long id) {
         return blockRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found block"));
     }
+
+    @Override
+    public Block getBlockByParkingLotAndBlockCode(ParkingLot parkingLot, String blockCode) {
+        return blockRepository.findByParkingLotAndBlockCode(parkingLot, blockCode);
+    }
 }
