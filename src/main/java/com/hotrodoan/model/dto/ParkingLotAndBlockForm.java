@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 public class ParkingLotAndBlockForm {
     private String name;
     private String address;
-    @Size(min = 5, max = 10)
-    private String zip;
+    @Size(max = 3)
+    private String zip="v";
     private boolean reentryAllowed;
     private String operatingCompanyName;
     private boolean valetParkingAvailable;

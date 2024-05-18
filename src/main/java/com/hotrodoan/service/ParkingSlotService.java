@@ -19,4 +19,5 @@ public interface ParkingSlotService {
     List<ParkingSlot> getAllParkingSlots();
     void updateParkingSlots(List<ParkingSlot> parkingSlots);
     int findMaxSlotNumber();
+    int countParkingSlotsByBlock(Block block);
 }

@@ -1,6 +1,7 @@
 package com.hotrodoan.controller;
 
 import com.hotrodoan.model.*;
+import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.*;
@@ -66,14 +67,10 @@ public class ParkingSlotReservationController {
     }
 
     @GetMapping("/add")
-    public ResponseEntity<List<ParkingSlot>> getAllParkingSlotAvailable(@RequestParam("startTimestamp") String startTimestampStr,
-                                                                        @RequestParam("durationInMinutes") int durationInMinutes,
-                                                                        @RequestParam("blockId") Long blockId,
-                                                                        @RequestParam("parkingLotId") Long parkingLotId) {
+    public ResponseEntity<List<AvailableParkingSlotsInfo>> getAllParkingSlotAvailable(@RequestParam("startTimestamp") String startTimestampStr,
+                                                                                      @RequestParam("durationInMinutes") int durationInMinutes) {
         Timestamp startTimestamp = Timestamp.valueOf(startTimestampStr);
-        Block block = blockService.getBlock(blockId);
-        ParkingLot parkingLot = parkingLotService.getParkingLot(parkingLotId);
-        return new ResponseEntity<>(parkingSlotReservationService.findAvailableParkingSlots(startTimestamp, durationInMinutes, block, parkingLot), HttpStatus.OK);
+        return new ResponseEntity<>(parkingSlotReservationService.findAvailableParkingSlotsAndBlockAndParkingLot(startTimestamp, durationInMinutes), HttpStatus.OK);
     }
 
     @PostMapping("/add")

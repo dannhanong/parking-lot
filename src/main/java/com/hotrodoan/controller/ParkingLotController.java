@@ -43,7 +43,7 @@ public class ParkingLotController {
     }
 
     @PostMapping("/admin/add")
-    public ResponseEntity<ParkingLot> createParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm) {
+    public ResponseEntity<ParkingLotAndBlockForm> createParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm) {
         ParkingLot parkingLot = new ParkingLot();
         Block block = new Block();
         parkingLot.setNumberOfBlocks(1);
@@ -56,23 +56,32 @@ public class ParkingLotController {
         parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
 
         ParkingLot newParkingLot = parkingLotService.createParkingLot(parkingLot);
+        int dBlock = 0;
 
         for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
             Block bl = new Block();
             bl.setBlockCode(blockAndParkingSlot.getBlockCode());
             bl.setParkingLot(newParkingLot);
+            dBlock += 1;
+            int dParkingSlot = 0;
             Block newBlock = blockService.createBlock(bl);
 
             int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
             for (int i = 0; i < numberOfSlots; i++) {
+                dParkingSlot += 1;
                 ParkingSlot parkingSlot = new ParkingSlot();
                 parkingSlot.setBlock(newBlock);
                 parkingSlot.setSlotNumber(i + 1);
                 parkingSlotService.addParkingSlot(parkingSlot);
             }
+            newBlock.setNumberOfParkingSlots(dParkingSlot);
+            blockService.updateBlock(newBlock, newBlock.getId());
         }
 
-        return new ResponseEntity<>(newParkingLot, HttpStatus.OK);
+        newParkingLot.setNumberOfBlocks(dBlock);
+        parkingLotService.updateParkingLot(newParkingLot, newParkingLot.getId());
+
+        return new ResponseEntity<>(parkingLotAndBlockForm, HttpStatus.OK);
     }
 
     @PutMapping("/admin/update/{id}")

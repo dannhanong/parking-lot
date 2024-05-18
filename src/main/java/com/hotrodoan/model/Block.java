@@ -21,7 +21,7 @@ public class Block {
     private ParkingLot parkingLot;
 
     @NotBlank(message = "Block code is required")
-    @Size(min = 1, max = 3)
+    @Size(min = 1, max = 60)
     private String blockCode;
     private int numberOfParkingSlots = 0;
     @Column(nullable = true)

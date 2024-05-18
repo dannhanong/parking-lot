@@ -43,7 +43,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/login/**", "/signup/**")
                                 .permitAll()
                                 .anyRequest()
-                                .authenticated()
+                                .permitAll()
                 )
                 .userDetailsService(customUserDetailService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

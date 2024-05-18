@@ -19,6 +19,6 @@ public class ParkingSlot {
     @Min(1)
     private int slotNumber;
     @Column(length = 1)
-    private String wingCode;
+    private String wingCode="v";
     boolean slotAvailable = true;
 }
