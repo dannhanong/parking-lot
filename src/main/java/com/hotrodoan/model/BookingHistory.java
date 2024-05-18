@@ -27,10 +27,5 @@ public class BookingHistory {
     @ManyToOne
     private ParkingSlot parkingSlot;
 
-    private Timestamp actualEntryTime;
-    private Timestamp actualExitTime;
-    private int basicCost;
-    private int penalty;
-    private int totalCost;
-    private boolean paid;
+    private int cost;
 }

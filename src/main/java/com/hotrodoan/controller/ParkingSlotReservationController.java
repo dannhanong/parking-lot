@@ -32,13 +32,13 @@ public class ParkingSlotReservationController {
     @Autowired
     private CustomerService customerService;
     @Autowired
-    private ParkingSlipService parkingSlipService;
-    @Autowired
     private ParkingSlotService parkingSlotService;
     @Autowired
     private BlockService blockService;
     @Autowired
     private ParkingLotService parkingLotService;
+    @Autowired
+    private RegularPassService regularPassService;
 
     @GetMapping("/admin/all")
     public ResponseEntity<Page<ParkingSlotReservation>> getAllParkingSlotReservations(@RequestParam(defaultValue = "")Date date,
@@ -83,21 +83,24 @@ public class ParkingSlotReservationController {
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer = customerService.getCustomerByUser(user);
         parkingSlotReservation.setCustomer(customer);
+        int cost = 500 * parkingSlotReservation.getDurationInMinutes();
+        RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
+        if (regularPass != null) {
+            parkingSlotReservation.setCost(0);
+        } else {
+            parkingSlotReservation.setCost(cost);
+        }
         ParkingSlotReservation newParkingSlotReservation = parkingSlotReservationService.createParkingSlotReservation(parkingSlotReservation);
 
         ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
 
-        if(!isParkingSlotAvailable(parkingSlot)) {
+        if(parkingSlot.isSlotAvailable() == false) {
             throw new RuntimeException("Parking slot is not available");
         }else{
             Long parkingSlotId = parkingSlot.getId();
             parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
             parkingSlot.setSlotAvailable(false);
             parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
-
-            ParkingSlip parkingSlip = new ParkingSlip();
-            parkingSlip.setParkingSlotReservation(newParkingSlotReservation);
-            parkingSlipService.createParkingSlip(parkingSlip);
             return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
         }     
     }

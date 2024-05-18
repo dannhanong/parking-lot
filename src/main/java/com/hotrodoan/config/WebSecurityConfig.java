@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+// @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig {
     private final CustomUserDetailService customUserDetailService;
 
@@ -39,10 +39,11 @@ public class WebSecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req -> req.requestMatchers("/login/**", "/signup/**")
+                        req -> req.requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/login/**", "/signup/**")
                                 .permitAll()
                                 .anyRequest()
-                                .permitAll()
+                                .authenticated()
                 )
                 .userDetailsService(customUserDetailService)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

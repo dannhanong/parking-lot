@@ -26,4 +26,6 @@ public class ParkingSlotReservation {
 
     @ManyToOne
     private ParkingSlot parkingSlot;
+
+    private int cost;
 }

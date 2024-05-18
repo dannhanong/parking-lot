@@ -42,6 +42,7 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
             ps.setDurationInMinutes(parkingSlotReservation.getDurationInMinutes());
             ps.setBookingDate(parkingSlotReservation.getBookingDate());
             ps.setParkingSlot(parkingSlotReservation.getParkingSlot());
+            ps.setCost(parkingSlotReservation.getCost());
             return parkingSlotReservationRepository.save(ps);
         }).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
     }
