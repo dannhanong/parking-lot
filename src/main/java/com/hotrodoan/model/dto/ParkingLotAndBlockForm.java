@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,5 +23,5 @@ public class ParkingLotAndBlockForm {
 
     @NotBlank(message = "Block code is required")
     @Size(min = 1, max = 3)
-    private BlockAndParkingSlot[] blockAndParkingSlots;
+    private List<BlockAndParkingSlot> blockAndParkingSlots;
 }

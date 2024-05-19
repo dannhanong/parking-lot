@@ -30,15 +30,14 @@ public class CustomerController {
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
 
-    @GetMapping("/admin/all")
+    @GetMapping("admin")
     public ResponseEntity<Page<Customer>> getAllCustomer(@RequestParam(defaultValue = "") String keyword,
-                                                         @RequestParam(defaultValue = "0") int page,
-                                                         @RequestParam(defaultValue = "10") int size,
-                                                         @RequestParam(defaultValue = "id") String sortBy,
-                                                         @RequestParam(defaultValue = "desc") String order) {
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "10") int size,
+                                                 @RequestParam(defaultValue = "id") String sortBy,
+                                                 @RequestParam(defaultValue = "desc") String order) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
-        Page<Customer> customers = customerService.getAllCustomer(keyword, pageable);
-        return new ResponseEntity<>(customers, HttpStatus.OK);
+        return new  ResponseEntity<>(customerService.getAllCustomerByKeyword(keyword, pageable), HttpStatus.OK);
     }
 
     @PostMapping("admin/add")

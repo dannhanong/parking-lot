@@ -22,6 +22,7 @@ public class Customer {
     private String vehicleNumber; //bien so xe
     //ngày đăng ký ban đầu
     private Date registrationDate;
+    @Column(nullable = true)
     private boolean regularCustomer = false;
     @Column(unique = true)
     @Pattern(regexp = "(\\d{4}[-.]?\\d{3}[-.]?\\d{3})", message = "Số điện thoại phải bao gồm 10 chữ số và có thể có dấu chấm hoặc dấu gạch ngang giữa các phần tử")

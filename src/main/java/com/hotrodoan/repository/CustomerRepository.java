@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CustomerRepository extends JpaRepository<Customer, Long> {
     @Query("SELECT c FROM Customer c WHERE CONCAT(c.vehicleNumber, ' ', c.contactNumber) LIKE %:keyword%" )
-    Page<Customer> findByKeyword(@Param("keyword") String keyword, Pageable pageable);
+    Page<Customer> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
     Customer findByUser(User user);
 }

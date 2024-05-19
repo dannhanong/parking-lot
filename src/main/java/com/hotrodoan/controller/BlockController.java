@@ -36,7 +36,7 @@ public class BlockController {
         ParkingLot parkingLot = parkingLotService.getParkingLot(id);
         Block block = new Block();
         block.setParkingLot(parkingLot);
-        block.setBlockCode(blockAndParkingSlot.getBlockCode());
+        block.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
         Block newBlock = blockService.createBlock(block);
         int numberOfParkingSlots = blockAndParkingSlot.getNumberOfParkingSlots();
         for (int i=0; i<numberOfParkingSlots; i++) {

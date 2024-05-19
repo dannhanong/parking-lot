@@ -1,6 +1,7 @@
 package com.hotrodoan.service;
 
 import com.hotrodoan.model.ParkingLot;
+import com.hotrodoan.model.dto.ParkingLotAndBlockForm;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -16,4 +17,5 @@ public interface ParkingLotService {
     List<ParkingLot> getParkingLotsByAddressAndReentryAllowedAndIdNot(String address, boolean reentryAllowed, Long id);
     ParkingLot showParkingLot(Long id);
     int countUsedParkingSlots(Long id);
+    ParkingLotAndBlockForm getParkingLotAndBlockForm(Long id);
 }

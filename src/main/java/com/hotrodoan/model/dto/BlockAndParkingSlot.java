@@ -1,5 +1,6 @@
 package com.hotrodoan.model.dto;
 
+import com.hotrodoan.model.Block;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BlockAndParkingSlot {
-    private String blockCode;
+    private Block block;
     private int numberOfParkingSlots;
 }

@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -47,6 +48,7 @@ public class ParkingLotController {
         ParkingLot parkingLot = new ParkingLot();
         Block block = new Block();
         parkingLot.setSlotAvailable(true);
+        parkingLot.setNumberOfBlocks(1);
         parkingLot.setName(parkingLotAndBlockForm.getName());
         parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
         parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
@@ -58,7 +60,7 @@ public class ParkingLotController {
 
         for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
             Block bl = new Block();
-            bl.setBlockCode(blockAndParkingSlot.getBlockCode());
+            bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
             bl.setParkingLot(newParkingLot);
             dBlock += 1;
             int dParkingSlot = 0;
@@ -84,37 +86,39 @@ public class ParkingLotController {
 
     @PutMapping("/admin/update/{id}")
     public ResponseEntity<ParkingLotAndBlockForm> updateParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm, @PathVariable Long id) {
-        ParkingLot parkingLot = new ParkingLot();
-        Block block = new Block();
-        parkingLot.setSlotAvailable(true);
-        parkingLot.setName(parkingLotAndBlockForm.getName());
-        parkingLot.setAddress(parkingLotAndBlockForm.getAddress());
-        parkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
-        parkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
-        parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
+        ParkingLotAndBlockForm pAndBForm = parkingLotService.getParkingLotAndBlockForm(id);
+        ParkingLot updateParkingLot = new ParkingLot();
 
-        ParkingLot updateParkingLot = parkingLotService.updateParkingLot(parkingLot, id);
+        updateParkingLot.setName(parkingLotAndBlockForm.getName());
+        updateParkingLot.setAddress(parkingLotAndBlockForm.getAddress());
+        updateParkingLot.setReentryAllowed(parkingLotAndBlockForm.isReentryAllowed());
+        updateParkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
+        updateParkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
+
+        ParkingLot updateP = parkingLotService.updateParkingLot(updateParkingLot, id);
 
         int dBlock = 0;
 
-        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
-            Block bl = blockService.getBlockByParkingLotAndBlockCode(updateParkingLot, blockAndParkingSlot.getBlockCode());
-            bl.setBlockCode(blockAndParkingSlot.getBlockCode());
-            dBlock += 1;
-            int dParkingSlot = 0;
-            Block newBlock = blockService.createBlock(bl);
-
-            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
-            for (int i = 0; i < numberOfSlots; i++) {
-                dParkingSlot += 1;
-                ParkingSlot parkingSlot = new ParkingSlot();
-                parkingSlot.setBlock(newBlock);
-                parkingSlot.setSlotNumber(i + 1);
-                parkingSlotService.addParkingSlot(parkingSlot);
-            }
-            newBlock.setNumberOfParkingSlots(dParkingSlot);
-            blockService.updateBlock(newBlock, newBlock.getId());
-        }
+//        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
+//
+//            Block bl = blockAndParkingSlot.getBlock();
+//            bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
+//            bl.setParkingLot(updateP);
+//            dBlock += 1;
+//            int dParkingSlot = 0;
+//            Block updateBlock = blockService.updateBlock(bl, bl.getId());
+//
+//            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+//            for (int i = 0; i < numberOfSlots; i++) {
+//                dParkingSlot += 1;
+//                ParkingSlot parkingSlot = new ParkingSlot();
+//                parkingSlot.setBlock(newBlock);
+//                parkingSlot.setSlotNumber(i + 1);
+//                parkingSlotService.addParkingSlot(parkingSlot);
+//            }
+//            newBlock.setNumberOfParkingSlots(dParkingSlot);
+//            blockService.updateBlock(newBlock, newBlock.getId());
+//        }
 
 //        newParkingLot.setNumberOfBlocks(dBlock);
 //        parkingLotService.updateParkingLot(newParkingLot, newParkingLot.getId());
@@ -147,6 +151,11 @@ public class ParkingLotController {
         parkingLotDetails.setParkingLot(parkingLot);
         parkingLotDetails.setSuggestions(suggestions);
         return new ResponseEntity<>(parkingLotDetails, HttpStatus.OK);
+    }
+
+    @GetMapping("/admin/show/{id}")
+    public ResponseEntity<ParkingLotAndBlockForm> showParkingLotAndBlock(@PathVariable Long id) {
+        return new ResponseEntity<>(parkingLotService.getParkingLotAndBlockForm(id), HttpStatus.OK);
     }
 //
 //    @PutMapping("admin/update/{id}")

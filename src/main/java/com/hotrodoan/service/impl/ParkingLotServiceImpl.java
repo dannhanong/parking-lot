@@ -1,19 +1,26 @@
 package com.hotrodoan.service.impl;
 
+import com.hotrodoan.model.Block;
 import com.hotrodoan.model.ParkingLot;
+import com.hotrodoan.model.dto.BlockAndParkingSlot;
+import com.hotrodoan.model.dto.ParkingLotAndBlockForm;
 import com.hotrodoan.repository.ParkingLotRepository;
+import com.hotrodoan.service.BlockService;
 import com.hotrodoan.service.ParkingLotService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ParkingLotServiceImpl implements ParkingLotService {
     @Autowired
     private ParkingLotRepository parkingLotRepository;
+    @Autowired
+    private BlockService blockService;
 
     @Override
     public ParkingLot createParkingLot(ParkingLot parkingLot) {
@@ -75,5 +82,34 @@ public class ParkingLotServiceImpl implements ParkingLotService {
     @Override
     public int countUsedParkingSlots(Long id) {
         return parkingLotRepository.countUsedParkingSlots(id);
+    }
+
+    @Override
+    public ParkingLotAndBlockForm getParkingLotAndBlockForm(Long id) {
+        ParkingLot parkingLot = parkingLotRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking lot"));
+
+        ParkingLotAndBlockForm parkingLotAndBlockForm = new ParkingLotAndBlockForm();
+        parkingLotAndBlockForm.setName(parkingLot.getName());
+        parkingLotAndBlockForm.setAddress(parkingLot.getAddress());
+        parkingLotAndBlockForm.setReentryAllowed(parkingLot.isReentryAllowed());
+        parkingLotAndBlockForm.setOperatingCompanyName(parkingLot.getOperatingCompanyName());
+        parkingLotAndBlockForm.setValetParkingAvailable(parkingLot.isValetParkingAvailable());
+
+        List<Block> blocks = blockService.getBlockByParkingLot(parkingLot);
+
+        List<BlockAndParkingSlot> blockAndParkingSlots = parkingLotAndBlockForm.getBlockAndParkingSlots();
+        if (blockAndParkingSlots == null) {
+            blockAndParkingSlots = new ArrayList<>();
+            parkingLotAndBlockForm.setBlockAndParkingSlots(blockAndParkingSlots);
+        }
+
+        for (Block block : blocks) {
+            BlockAndParkingSlot blAndPS = new BlockAndParkingSlot();
+            blAndPS.setBlock(block);
+            blAndPS.setNumberOfParkingSlots(block.getNumberOfParkingSlots());
+            blockAndParkingSlots.add(blAndPS);
+        }
+
+        return parkingLotAndBlockForm;
     }
 }

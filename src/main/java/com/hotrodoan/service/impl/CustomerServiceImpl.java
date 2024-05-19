@@ -19,8 +19,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<Customer> getAllCustomer(String keyword, Pageable pageable) {
-        return customerRepository.findByKeyword(keyword, pageable);
+    public Page<Customer> getAllCustomerByKeyword(String keyword, Pageable pageable) {
+        return customerRepository.searchByKeyword(keyword, pageable);
     }
 
     @Override
