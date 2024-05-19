@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface ParkingSlotReservationService {
+    Page<ParkingSlotReservation> getAllParkingSlotReservations(Pageable pageable);
     ParkingSlotReservation createParkingSlotReservation(ParkingSlotReservation parkingSlotReservation);
     Page<ParkingSlotReservation> getAllParkingSlotReservations(Date date, Pageable pageable);
     ParkingSlotReservation updateParkingSlotReservation(ParkingSlotReservation parkingSlotReservation, Long id);

@@ -34,6 +34,11 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     private BlockService blockService;
 
     @Override
+    public Page<ParkingSlotReservation> getAllParkingSlotReservations(Pageable pageable) {
+        return parkingSlotReservationRepository.findAll(pageable);
+    }
+
+    @Override
     public ParkingSlotReservation createParkingSlotReservation(ParkingSlotReservation parkingSlotReservation) {
         parkingSlotReservation.setBookingDate(new Date(System.currentTimeMillis()));
         return parkingSlotReservationRepository.save(parkingSlotReservation);

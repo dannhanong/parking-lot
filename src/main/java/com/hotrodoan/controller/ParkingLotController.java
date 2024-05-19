@@ -34,13 +34,14 @@ public class ParkingLotController {
     private ParkingSlotService parkingSlotService;
 
     @GetMapping("")
-    public ResponseEntity<Page<ParkingLot>> getAllParkingLots(@RequestParam(defaultValue = "") String keyword,
+    public ResponseEntity<Page<ParkingLot>> getAllParkingLots(@RequestParam(defaultValue = "") String name,
+                                                              @RequestParam(defaultValue = "") String address,
                                                               @RequestParam(defaultValue = "0") int page,
                                                               @RequestParam(defaultValue = "10") int size,
                                                               @RequestParam(defaultValue = "id") String sortBy,
                                                               @RequestParam(defaultValue = "desc") String order) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
-        return new ResponseEntity<>(parkingLotService.getAllParkingLots(keyword, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(parkingLotService.getAllParkingLots(name, address, pageable), HttpStatus.OK);
     }
 
     @PostMapping("/admin/add")
@@ -56,13 +57,13 @@ public class ParkingLotController {
         parkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
 
         ParkingLot newParkingLot = parkingLotService.createParkingLot(parkingLot);
-        int dBlock = 0;
+        int dBlock = parkingLotAndBlockForm.getBlockAndParkingSlots().size();
 
         for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
             Block bl = new Block();
             bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
             bl.setParkingLot(newParkingLot);
-            dBlock += 1;
+//            dBlock += 1;
             int dParkingSlot = 0;
             Block newBlock = blockService.createBlock(bl);
 
@@ -85,9 +86,9 @@ public class ParkingLotController {
     }
 
     @PutMapping("/admin/update/{id}")
-    public ResponseEntity<ParkingLotAndBlockForm> updateParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm, @PathVariable Long id) {
+    public ResponseEntity<ParkingLotAndBlockForm> updateParkingLot(@RequestBody ParkingLotAndBlockForm parkingLotAndBlockForm, @PathVariable("id") Long id) {
         ParkingLotAndBlockForm pAndBForm = parkingLotService.getParkingLotAndBlockForm(id);
-        ParkingLot updateParkingLot = new ParkingLot();
+        ParkingLot updateParkingLot = parkingLotService.showParkingLot(id);
 
         updateParkingLot.setName(parkingLotAndBlockForm.getName());
         updateParkingLot.setAddress(parkingLotAndBlockForm.getAddress());
@@ -95,38 +96,74 @@ public class ParkingLotController {
         updateParkingLot.setOperatingCompanyName(parkingLotAndBlockForm.getOperatingCompanyName());
         updateParkingLot.setValetParkingAvailable(parkingLotAndBlockForm.isValetParkingAvailable());
 
+        int dBlock = parkingLotAndBlockForm.getBlockAndParkingSlots().size();
+
+        updateParkingLot.setNumberOfBlocks(dBlock);
+
         ParkingLot updateP = parkingLotService.updateParkingLot(updateParkingLot, id);
 
-        int dBlock = 0;
+        List<Block> blocks = blockService.getBlockByParkingLotId(updateP.getId());
 
-        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
-
-            Block bl = blockAndParkingSlot.getBlock();
-            bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
-            bl.setParkingLot(updateP);
-            dBlock += 1;
-            int dParkingSlot = 0;
-            Block updateBlock = blockService.updateBlock(bl, bl.getId());
-
-            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
-
-            if (numberOfSlots != 0 || numberOfSlots != parkingSlotService.countParkingSlotsByBlock(updateBlock)) {
-                List<ParkingSlot> parkingSlots = parkingSlotService.getParkingSlotByBlockId(updateBlock.getId());
-                for (ParkingSlot parkingSlot : parkingSlots) {
-                    parkingSlotService.deleteParkingSlot(parkingSlot.getId());
-                }
-
-                for (int i = 0; i < numberOfSlots; i++) {
-                    dParkingSlot += 1;
-                    ParkingSlot parkingSlot = new ParkingSlot();
-                    parkingSlot.setBlock(updateBlock);
-                    parkingSlot.setSlotNumber(i + 1);
-                    parkingSlotService.addParkingSlot(parkingSlot);
-                }
-                updateBlock.setNumberOfParkingSlots(dParkingSlot);
-                blockService.updateBlock(updateBlock, updateBlock.getId());
+        List<BlockAndParkingSlot> blockAndParkingSlots = pAndBForm.getBlockAndParkingSlots();
+        List<BlockAndParkingSlot> newBlockAndParkingSlots = parkingLotAndBlockForm.getBlockAndParkingSlots();
+        if (blockAndParkingSlots.size() > newBlockAndParkingSlots.size()) {
+            for (int i = newBlockAndParkingSlots.size(); i < blockAndParkingSlots.size(); i++) {
+                blockService.deleteBlock(blockAndParkingSlots.get(i).getBlock().getId());
             }
 
+            for (int i = 0; i < newBlockAndParkingSlots.size(); i++) {
+                Block bl = blockAndParkingSlots.get(i).getBlock();
+                bl.setBlockCode(newBlockAndParkingSlots.get(i).getBlock().getBlockCode());
+                Block updateBlock = blockService.updateBlock(bl, bl.getId());
+            }
+
+        }
+        else if (blockAndParkingSlots.size() == newBlockAndParkingSlots.size()) {
+            for(int i=0; i< newBlockAndParkingSlots.size(); i++){
+                Block bl = blockAndParkingSlots.get(i).getBlock();
+                bl.setBlockCode(newBlockAndParkingSlots.get(i).getBlock().getBlockCode());
+
+                int dParkingSlot = newBlockAndParkingSlots.get(i).getNumberOfParkingSlots();
+                bl.setNumberOfParkingSlots(dParkingSlot);
+
+                Block updateBlock = blockService.updateBlock(bl, bl.getId());
+
+                if (dParkingSlot < blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
+                    for (int j = dParkingSlot; j < blockAndParkingSlots.get(i).getNumberOfParkingSlots(); j++) {
+                        ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlock(j+1, updateBlock.getId());
+                        parkingSlotService.deleteParkingSlot(parkingSlot.getId());
+                    }
+                } else if (dParkingSlot > blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
+                    int maxOfSlotNumber = parkingSlotService.findMaxSlotNumber(updateBlock.getId());
+                    for (int j = maxOfSlotNumber; j < dParkingSlot; j++) {
+                        ParkingSlot parkingSlot = new ParkingSlot();
+                        parkingSlot.setBlock(updateBlock);
+                        parkingSlot.setSlotNumber(j + 1);
+                        parkingSlotService.addParkingSlot(parkingSlot);
+                    }
+                }
+            }
+        }
+        else {
+            for (int i = blockAndParkingSlots.size(); i < newBlockAndParkingSlots.size(); i++) {
+                BlockAndParkingSlot blockAndParkingSlot = newBlockAndParkingSlots.get(i);
+                Block bl = new Block();
+                bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
+                bl.setParkingLot(updateP);
+                int dParkingSlot = 0;
+                Block newBlock = blockService.createBlock(bl);
+
+                int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+                for (int j = 0; j < numberOfSlots; j++) {
+                    dParkingSlot += 1;
+                    ParkingSlot parkingSlot = new ParkingSlot();
+                    parkingSlot.setBlock(newBlock);
+                    parkingSlot.setSlotNumber(j + 1);
+                    parkingSlotService.addParkingSlot(parkingSlot);
+                }
+                newBlock.setNumberOfParkingSlots(dParkingSlot);
+                blockService.updateBlock(newBlock, newBlock.getId());
+            }
         }
 
         updateP.setNumberOfBlocks(dBlock);

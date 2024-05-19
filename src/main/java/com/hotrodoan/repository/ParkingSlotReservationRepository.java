@@ -15,6 +15,7 @@ import java.util.List;
 
 @Repository
 public interface ParkingSlotReservationRepository extends JpaRepository<ParkingSlotReservation, Long> {
+    Page<ParkingSlotReservation> findAll(Pageable pageable);
     Page<ParkingSlotReservation> findByBookingDate(Date date, Pageable pageable);
     Page<ParkingSlotReservation> findByCustomerAndBookingDate(Customer customer, Date date, Pageable pageable);
     List<ParkingSlotReservation> findByParkingSlot(ParkingSlot parkingSlot);

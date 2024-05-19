@@ -23,17 +23,17 @@ public class ParkingSlotController {
         return ResponseEntity.ok(parkingSlotService.getParkingSlotByBlock(block));
     }
 
-    @PostMapping("/admin/add")
-    public ResponseEntity<ParkingSlot> addParkingSlot(@RequestBody CreateParkingSlotForm createParkingSlotForm) {
-        ParkingSlot parkingSlot = new ParkingSlot();
-        parkingSlot.setBlock(createParkingSlotForm.getBlock());
+    // @PostMapping("/admin/add")
+    // public ResponseEntity<ParkingSlot> addParkingSlot(@RequestBody CreateParkingSlotForm createParkingSlotForm) {
+    //     ParkingSlot parkingSlot = new ParkingSlot();
+    //     parkingSlot.setBlock(createParkingSlotForm.getBlock());
         
-        int maxOfSlot = parkingSlotService.findMaxSlotNumber();
-        for (int i = 0; i < createParkingSlotForm.getWantManySlots(); i++) {
-            parkingSlot.setSlotNumber(maxOfSlot+i+1);
-        }
-        return new ResponseEntity<>(parkingSlotService.addParkingSlot(parkingSlot), HttpStatus.CREATED);
-    }
+    //     int maxOfSlot = parkingSlotService.findMaxSlotNumber();
+    //     for (int i = 0; i < createParkingSlotForm.getWantManySlots(); i++) {
+    //         parkingSlot.setSlotNumber(maxOfSlot+i+1);
+    //     }
+    //     return new ResponseEntity<>(parkingSlotService.addParkingSlot(parkingSlot), HttpStatus.CREATED);
+    // }
 
     @PutMapping("/admin/update/{id}")
     public ResponseEntity<ParkingSlot> updateParkingSlot(@RequestBody ParkingSlot parkingSlot, @PathVariable Long id) {

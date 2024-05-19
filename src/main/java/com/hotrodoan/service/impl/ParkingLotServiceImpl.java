@@ -28,8 +28,8 @@ public class ParkingLotServiceImpl implements ParkingLotService {
     }
 
     @Override
-    public Page<ParkingLot> getAllParkingLots(String keyword, Pageable pageable) {
-        Page<ParkingLot> parkingLots = parkingLotRepository.findByKeyword(keyword, pageable);
+    public Page<ParkingLot> getAllParkingLots(String name, String address, Pageable pageable) {
+        Page<ParkingLot> parkingLots = parkingLotRepository.findByKeyword(name, address, pageable);
 
         for (ParkingLot parkingLot : parkingLots) {
             int usedSlots = parkingLotRepository.countUsedParkingSlots(parkingLot.getId());

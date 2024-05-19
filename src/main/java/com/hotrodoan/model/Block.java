@@ -1,5 +1,8 @@
 package com.hotrodoan.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -27,4 +30,8 @@ public class Block {
     @Column(nullable = true)
     private boolean blockFull = false;
     private int usedParkingSlots = 0;
+
+    @OneToMany(mappedBy = "block", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
+    @JsonIgnore
+    private List<ParkingSlot> parkingSlots;
 }

@@ -43,7 +43,7 @@ public class RegularPassController {
     @Autowired
     private VNPayService vnPayService;
 
-    @GetMapping("/admin/all")
+    @GetMapping("/admin")
     public ResponseEntity<Page<RegularPass>> getAllRegularPass(@RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size,
                                                                @RequestParam(defaultValue = "id") String sortBy,

@@ -72,12 +72,17 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     }
 
     @Override
-    public int findMaxSlotNumber() {
-        return parkingSlotRepository.findMaxSlotNumber();
+    public int findMaxSlotNumber(Long blockId) {
+        return parkingSlotRepository.findMaxSlotNumber(blockId);
     }
 
     @Override
     public int countParkingSlotsByBlock(Block block) {
         return parkingSlotRepository.countByBlock(block);
+    }
+
+    @Override
+    public ParkingSlot getParkingSlotBySlotNumberAndBlock(int slotNumber, Long blockId) {
+        return parkingSlotRepository.findBySlotNumberAndBlockId(slotNumber, blockId);
     }
 }

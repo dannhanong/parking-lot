@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Date;
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 @RestController
@@ -42,14 +44,26 @@ public class ParkingSlotReservationController {
     @Autowired
     private RegularPassService regularPassService;
 
-    @GetMapping("/admin/all")
-    public ResponseEntity<Page<ParkingSlotReservation>> getAllParkingSlotReservations(@RequestParam(defaultValue = "")Date date,
-                                                                                      @RequestParam(defaultValue = "0") int page,
-                                                                                      @RequestParam(defaultValue = "10") int size,
-                                                                                      @RequestParam(defaultValue = "id") String sortBy,
-                                                                                      @RequestParam(defaultValue = "desc") String order) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
-        return new ResponseEntity<>(parkingSlotReservationService.getAllParkingSlotReservations(date, pageable), HttpStatus.OK);
+    @GetMapping("/admin")
+    public ResponseEntity<Page<ParkingSlotReservation>> getAllParkingSlotReservations(@RequestParam(defaultValue = "") String dateStr,
+                                                                                    @RequestParam(defaultValue = "0") int page,
+                                                                                    @RequestParam(defaultValue = "10") int size,
+                                                                                    @RequestParam(defaultValue = "id") String sortBy,
+                                                                                    @RequestParam(defaultValue = "desc") String order) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
+        Date sqlSDate = null;
+        if (!dateStr.isEmpty()) {
+            try {
+                java.util.Date parsed = format.parse(dateStr);
+                sqlSDate = new Date(parsed.getTime());
+            } catch (ParseException e) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(parkingSlotReservationService.getAllParkingSlotReservations(sqlSDate, pageable), HttpStatus.OK);
+        }else {
+            return new ResponseEntity<>(parkingSlotReservationService.getAllParkingSlotReservations(pageable), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/show")

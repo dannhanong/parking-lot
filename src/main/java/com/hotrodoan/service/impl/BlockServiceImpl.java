@@ -53,4 +53,9 @@ public class BlockServiceImpl implements BlockService {
     public Block getBlockByParkingLotAndBlockCode(ParkingLot parkingLot, String blockCode) {
         return blockRepository.findByParkingLotAndBlockCode(parkingLot, blockCode);
     }
+
+    @Override
+    public List<Block> getBlockByParkingLotId(Long parkingLotId) {
+        return blockRepository.findByParkingLotId(parkingLotId);
+    }
 }

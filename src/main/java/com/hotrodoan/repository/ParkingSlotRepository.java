@@ -23,8 +23,9 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long>{
             "WHERE ps.block.id = :id AND ps.slotAvailable = false")
     int countUsedParkingSlots(Long id);
 
-    @Query("SELECT MAX(p.slotNumber) FROM ParkingSlot p GROUP BY p.block.id HAVING p.block.id = :blockId")
-    Integer findMaxSlotNumber();
+    @Query("SELECT MAX(p.slotNumber) FROM ParkingSlot p WHERE p.block.id = :blockId")
+    Integer findMaxSlotNumber(Long blockId);
 
     int countByBlock(Block block);
+    ParkingSlot findBySlotNumberAndBlockId(int slotNumber, Long blockId);
 }

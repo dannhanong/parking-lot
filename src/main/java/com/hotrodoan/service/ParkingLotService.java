@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ParkingLotService {
     ParkingLot createParkingLot(ParkingLot parkingLot);
-    Page<ParkingLot> getAllParkingLots(String keyword, Pageable pageable);
+    Page<ParkingLot> getAllParkingLots(String name, String address, Pageable pageable);
     ParkingLot updateParkingLot(ParkingLot parkingLot, Long id);
     void deleteParkingLot(Long id);
     ParkingLot getParkingLot(Long id);

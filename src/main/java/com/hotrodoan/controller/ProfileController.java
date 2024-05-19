@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/profile")
+@CrossOrigin(origins = "*")
 public class ProfileController {
     @Autowired
     private CustomerService customerService;

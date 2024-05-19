@@ -11,8 +11,8 @@ import java.util.List;
 
 @Repository
 public interface ParkingLotRepository extends JpaRepository<ParkingLot, Long> {
-    @Query("SELECT p FROM ParkingLot p WHERE CONCAT(p.address, ' ', p.zip, ' ', p.operatingCompanyName) LIKE %:keyword%")
-    Page<ParkingLot> findByKeyword(String keyword, Pageable pageable);
+    @Query("SELECT p FROM ParkingLot p WHERE CONCAT(p.name, ' ', p.operatingCompanyName) LIKE %:name% AND p.address LIKE :address")
+    Page<ParkingLot> findByKeyword(String name, String address, Pageable pageable);
 
     List<ParkingLot> findByAddressAndReentryAllowedAndIdNot(String address, boolean reentryAllowed, Long id);
     @Query("SELECT COUNT(ps) FROM ParkingSlot ps " +
