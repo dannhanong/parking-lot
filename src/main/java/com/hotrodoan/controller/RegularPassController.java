@@ -53,6 +53,12 @@ public class RegularPassController {
         return new ResponseEntity<>(regularPasses, regularPasses.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<RegularPass> getRegularPass(@PathVariable Long id) {
+        RegularPass regularPass = regularPassService.getRegularPass(id);
+        return new ResponseEntity<>(regularPass, regularPass == null ? HttpStatus.NOT_FOUND : HttpStatus.OK);
+    }
+
     @GetMapping("/show")
     public ResponseEntity<RegularPass> showRegularPass(HttpServletRequest request,
                                                              @RequestParam(defaultValue = "0") int page,

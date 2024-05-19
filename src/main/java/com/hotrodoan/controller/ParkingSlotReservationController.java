@@ -132,4 +132,9 @@ public class ParkingSlotReservationController {
         parkingSlotReservationService.deleteParkingSlotReservation(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ParkingSlotReservation> getParkingSlotReservation(@PathVariable Long id) {
+        return new ResponseEntity<>(parkingSlotReservationService.getParkingSlotReservation(id), HttpStatus.OK);
+    }
 }
