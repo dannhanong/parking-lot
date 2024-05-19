@@ -99,29 +99,38 @@ public class ParkingLotController {
 
         int dBlock = 0;
 
-//        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
-//
-//            Block bl = blockAndParkingSlot.getBlock();
-//            bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
-//            bl.setParkingLot(updateP);
-//            dBlock += 1;
-//            int dParkingSlot = 0;
-//            Block updateBlock = blockService.updateBlock(bl, bl.getId());
-//
-//            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
-//            for (int i = 0; i < numberOfSlots; i++) {
-//                dParkingSlot += 1;
-//                ParkingSlot parkingSlot = new ParkingSlot();
-//                parkingSlot.setBlock(newBlock);
-//                parkingSlot.setSlotNumber(i + 1);
-//                parkingSlotService.addParkingSlot(parkingSlot);
-//            }
-//            newBlock.setNumberOfParkingSlots(dParkingSlot);
-//            blockService.updateBlock(newBlock, newBlock.getId());
-//        }
+        for (BlockAndParkingSlot blockAndParkingSlot : parkingLotAndBlockForm.getBlockAndParkingSlots()) {
 
-//        newParkingLot.setNumberOfBlocks(dBlock);
-//        parkingLotService.updateParkingLot(newParkingLot, newParkingLot.getId());
+            Block bl = blockAndParkingSlot.getBlock();
+            bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
+            bl.setParkingLot(updateP);
+            dBlock += 1;
+            int dParkingSlot = 0;
+            Block updateBlock = blockService.updateBlock(bl, bl.getId());
+
+            int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
+
+            if (numberOfSlots != 0 || numberOfSlots != parkingSlotService.countParkingSlotsByBlock(updateBlock)) {
+                List<ParkingSlot> parkingSlots = parkingSlotService.getParkingSlotByBlockId(updateBlock.getId());
+                for (ParkingSlot parkingSlot : parkingSlots) {
+                    parkingSlotService.deleteParkingSlot(parkingSlot.getId());
+                }
+
+                for (int i = 0; i < numberOfSlots; i++) {
+                    dParkingSlot += 1;
+                    ParkingSlot parkingSlot = new ParkingSlot();
+                    parkingSlot.setBlock(updateBlock);
+                    parkingSlot.setSlotNumber(i + 1);
+                    parkingSlotService.addParkingSlot(parkingSlot);
+                }
+                updateBlock.setNumberOfParkingSlots(dParkingSlot);
+                blockService.updateBlock(updateBlock, updateBlock.getId());
+            }
+
+        }
+
+        updateP.setNumberOfBlocks(dBlock);
+        parkingLotService.updateParkingLot(updateP, updateP.getId());
 
         return new ResponseEntity<>(parkingLotAndBlockForm, HttpStatus.OK);
     }

@@ -14,6 +14,7 @@ public interface ParkingSlotService {
     void deleteParkingSlot(Long id);
 
     List<ParkingSlot> getParkingSlotByBlock(Block block);
+    List<ParkingSlot> getParkingSlotByBlockId(Long blockId);
     ParkingSlot getParkingSlot(Long id);
     int countUsedParkingSlots(Long id);
     List<ParkingSlot> getAllParkingSlots();

@@ -45,19 +45,19 @@ public class CustomerController {
         return new ResponseEntity<>(customerService.addCustomer(customer), HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<Customer> updateCustomer(HttpServletRequest request, @RequestBody Customer customer) {
-        String token = jwtTokenFilter.getJwt(request);
-        String username = jwtProvider.getUsernameFromToken(token);
-        User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
-        Customer customer1 = customerService.getCustomerByUser(user);
-        customer1.setVehicleNumber(customer.getVehicleNumber());
-        customer1.setRegistrationDate(customer.getRegistrationDate());
-        customer1.setRegularCustomer(customer.isRegularCustomer());
-        customer1.setContactNumber(customer.getContactNumber());
-        customer1.setUser(user);
-        return new ResponseEntity<>(customerService.updateCustomer(customer1, customer1.getId()), HttpStatus.OK);
-    }
+//    @PutMapping("/update")
+//    public ResponseEntity<Customer> updateCustomer(HttpServletRequest request, @RequestBody Customer customer) {
+//        String token = jwtTokenFilter.getJwt(request);
+//        String username = jwtProvider.getUsernameFromToken(token);
+//        User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+//        Customer customer1 = customerService.getCustomerByUser(user);
+//        customer1.setVehicleNumber(customer.getVehicleNumber());
+//        customer1.setRegistrationDate(customer.getRegistrationDate());
+//        customer1.setRegularCustomer(customer.isRegularCustomer());
+//        customer1.setContactNumber(customer.getContactNumber());
+//        customer1.setUser(user);
+//        return new ResponseEntity<>(customerService.updateCustomer(customer1, customer1.getId()), HttpStatus.OK);
+//    }
 
     @DeleteMapping("admin/delete/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable("id") Long id) {

@@ -47,6 +47,11 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     }
 
     @Override
+    public List<ParkingSlot> getParkingSlotByBlockId(Long blockId) {
+        return parkingSlotRepository.findByBlockId(blockId);
+    }
+
+    @Override
     public ParkingSlot getParkingSlot(Long id) {
         return parkingSlotRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking slot"));
     }
