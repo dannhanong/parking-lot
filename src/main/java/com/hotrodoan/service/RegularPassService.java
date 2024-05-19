@@ -14,4 +14,5 @@ public interface RegularPassService {
     void deleteRegularPass(Long id);
     RegularPass updateRegularPass(RegularPass regularPass, Long id);
     RegularPass getRegularByCustomer(Customer customer);
+    Page<RegularPass> getByCustomerName(String name, Pageable pageable);
 }

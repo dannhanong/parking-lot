@@ -60,4 +60,9 @@ public class RegularPassServiceImpl implements RegularPassService {
     public RegularPass getRegularByCustomer(Customer customer) {
         return regularPassRepository.findByCustomer(customer);
     }
+
+    @Override
+    public Page<RegularPass> getByCustomerName(String name, Pageable pageable) {
+        return regularPassRepository.searchByCustomerName(name, pageable);
+    }
 }

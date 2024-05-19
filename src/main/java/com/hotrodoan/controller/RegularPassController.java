@@ -44,12 +44,13 @@ public class RegularPassController {
     private VNPayService vnPayService;
 
     @GetMapping("/admin")
-    public ResponseEntity<Page<RegularPass>> getAllRegularPass(@RequestParam(defaultValue = "0") int page,
+    public ResponseEntity<Page<RegularPass>> getAllRegularPass(@RequestParam(defaultValue = "") String name,
+                                                               @RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int size,
                                                                @RequestParam(defaultValue = "id") String sortBy,
                                                                @RequestParam(defaultValue = "desc") String order) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
-        Page<RegularPass> regularPasses = regularPassService.getAllRegularPass(pageable);
+        Page<RegularPass> regularPasses = regularPassService.getByCustomerName(name, pageable);
         return new ResponseEntity<>(regularPasses, regularPasses.isEmpty() ? HttpStatus.NOT_FOUND : HttpStatus.OK);
     }
 
