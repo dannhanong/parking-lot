@@ -18,4 +18,5 @@ public interface ParkingLotService {
     ParkingLot showParkingLot(Long id);
     int countUsedParkingSlots(Long id);
     ParkingLotAndBlockForm getParkingLotAndBlockForm(Long id);
+    Page<ParkingLot> getAllParkingLots(Pageable pageable);
 }

@@ -41,6 +41,8 @@ public class ParkingLotController {
                                                               @RequestParam(defaultValue = "id") String sortBy,
                                                               @RequestParam(defaultValue = "desc") String order) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
+        if (name.equals("") && address.equals(""))
+            return new ResponseEntity<>(parkingLotService.getAllParkingLots(pageable), HttpStatus.OK);
         return new ResponseEntity<>(parkingLotService.getAllParkingLots(name, address, pageable), HttpStatus.OK);
     }
 

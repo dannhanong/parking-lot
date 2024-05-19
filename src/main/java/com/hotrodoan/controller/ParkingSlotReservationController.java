@@ -133,7 +133,7 @@ public class ParkingSlotReservationController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/{id}")
     public ResponseEntity<ParkingSlotReservation> getParkingSlotReservation(@PathVariable Long id) {
         return new ResponseEntity<>(parkingSlotReservationService.getParkingSlotReservation(id), HttpStatus.OK);
     }

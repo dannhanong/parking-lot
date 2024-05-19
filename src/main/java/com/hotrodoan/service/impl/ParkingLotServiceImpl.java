@@ -112,4 +112,9 @@ public class ParkingLotServiceImpl implements ParkingLotService {
 
         return parkingLotAndBlockForm;
     }
+
+    @Override
+    public Page<ParkingLot> getAllParkingLots(Pageable pageable) {
+        return parkingLotRepository.findAll(pageable);
+    }
 }
