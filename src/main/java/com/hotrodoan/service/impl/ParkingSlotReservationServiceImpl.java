@@ -62,6 +62,7 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
             ps.setConfirmName(parkingSlotReservation.getConfirmName());
             ps.setPhoneNumber(parkingSlotReservation.getPhoneNumber());
             ps.setConfirmVehicleNumber(parkingSlotReservation.getConfirmVehicleNumber());
+            ps.setPair(parkingSlotReservation.isPair());
             return parkingSlotReservationRepository.save(ps);
         }).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
     }

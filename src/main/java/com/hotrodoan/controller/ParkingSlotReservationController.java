@@ -3,6 +3,7 @@ package com.hotrodoan.controller;
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
 import com.hotrodoan.model.dto.ResponseMessage;
+import com.hotrodoan.model.dto.VNPayMessage;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.*;
@@ -47,6 +48,8 @@ public class ParkingSlotReservationController {
     private ParkingLotService parkingLotService;
     @Autowired
     private RegularPassService regularPassService;
+    @Autowired
+    private VNPayService vnPayService;
 
     @GetMapping("/admin")
     public ResponseEntity<Page<ParkingSlotReservation>> getAllParkingSlotReservations(@RequestParam(defaultValue = "") String dateStr,
@@ -93,7 +96,7 @@ public class ParkingSlotReservationController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ParkingSlotReservation> createParkingSlotReservation(HttpServletRequest request, @RequestBody ParkingSlotReservation parkingSlotReservation) {
+    public ResponseEntity<VNPayMessage> createParkingSlotReservation(HttpServletRequest request, @RequestBody ParkingSlotReservation parkingSlotReservation) {
         String jwt = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(jwt);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -117,7 +120,14 @@ public class ParkingSlotReservationController {
             parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
             parkingSlot.setSlotAvailable(false);
             parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
-            return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
+//            return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
+
+            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+
+            String vnpayUrl = vnPayService.createOrder(parkingSlotReservation.getCost(), newParkingSlotReservation.getId().toString()+"thu2", baseUrl);
+
+            VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
+            return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
         }     
     }
 

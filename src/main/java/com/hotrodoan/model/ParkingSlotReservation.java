@@ -34,4 +34,5 @@ public class ParkingSlotReservation {
     private String phoneNumber;
     @Column(nullable = false)
     private String confirmVehicleNumber;
+    private boolean pair = false;
 }

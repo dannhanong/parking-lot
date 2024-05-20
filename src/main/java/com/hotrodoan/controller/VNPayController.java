@@ -1,7 +1,9 @@
 package com.hotrodoan.controller;
 
+import com.hotrodoan.model.ParkingSlotReservation;
 import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.VnPayPayment;
+import com.hotrodoan.service.ParkingSlotReservationService;
 import com.hotrodoan.service.RegularPassService;
 import com.hotrodoan.service.VNPayService;
 import com.hotrodoan.service.VnPayPaymentService;
@@ -21,12 +23,12 @@ import java.util.Date;
 public class VNPayController {
     @Autowired
     private VNPayService vnPayService;
-
     @Autowired
     private VnPayPaymentService vnPayPaymentService;
-
     @Autowired
     private RegularPassService regularPassService;
+    @Autowired
+    private ParkingSlotReservationService parkingSlotReservationService;
 
 //    @Autowired
 //    private Member_PackageService member_packageService;
@@ -80,15 +82,22 @@ public class VNPayController {
         }
 
         if (paymentStatus == 1){
-            RegularPass regularPass = regularPassService.getRegularPass(Long.parseLong(orderInfo));
-            if (regularPass.isPair()){
-                regularPass.setRenewPair(true);
-            }else {
-                regularPass.setRenewPair(true);
-                regularPass.setPair(true);
+            if (orderInfo.contains("thu2")){
+                String idBookingStr = orderInfo.replace("thu2", "");
+                Long idBooking = Long.parseLong(idBookingStr);
+                ParkingSlotReservation parkingSlotReservation = parkingSlotReservationService.getParkingSlotReservation(idBooking);
+                parkingSlotReservation.setPair(true);
+                parkingSlotReservationService.updateParkingSlotReservation(parkingSlotReservation, idBooking);
+            }else{
+                RegularPass regularPass = regularPassService.getRegularPass(Long.parseLong(orderInfo));
+                if (regularPass.isPair()){
+                    regularPass.setRenewPair(true);
+                }else {
+                    regularPass.setRenewPair(true);
+                    regularPass.setPair(true);
+                }
+                regularPassService.updateRegularPass(regularPass, regularPass.getId());
             }
-
-            regularPassService.updateRegularPass(regularPass, regularPass.getId());
             return "ordersuccess";
             // response.put("status", "success");
         }else
