@@ -104,7 +104,7 @@ public class ParkingSlotReservationController {
         parkingSlotReservation.setCustomer(customer);
         int cost = 500 * parkingSlotReservation.getDurationInMinutes();
         RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
-        if (regularPass != null) {
+        if (regularPass != null || regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) || regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now()))){
             parkingSlotReservation.setCost(0);
         } else {
             parkingSlotReservation.setCost(cost);
@@ -122,12 +122,18 @@ public class ParkingSlotReservationController {
             parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
 //            return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
 
-            String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+            if (parkingSlotReservation.getCost() > 0){
+                String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 
-            String vnpayUrl = vnPayService.createOrder(parkingSlotReservation.getCost(), newParkingSlotReservation.getId().toString()+"thu2", baseUrl);
+                String vnpayUrl = vnPayService.createOrder(parkingSlotReservation.getCost(), newParkingSlotReservation.getId().toString()+"thu2", baseUrl);
 
-            VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
-            return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
+                VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
+                return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
+            }else {
+                newParkingSlotReservation.setPair(true);
+                parkingSlotReservationService.updateParkingSlotReservation(newParkingSlotReservation, newParkingSlotReservation.getId());
+                return new ResponseEntity<>(new VNPayMessage("no-payment", "free"), HttpStatus.OK);
+            }
         }     
     }
 

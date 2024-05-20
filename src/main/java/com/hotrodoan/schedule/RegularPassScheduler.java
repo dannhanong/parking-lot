@@ -16,7 +16,7 @@ public class RegularPassScheduler {
     @Autowired
     private RegularPassService regularPassService;
 
-    @Scheduled(fixedRate = 3600000)
+    @Scheduled(fixedRate = 600000)
     public void checkNewAndResetRenew() {
         List<RegularPass> regularPasses = regularPassService.getAllRegularPass();
 
