@@ -27,6 +27,7 @@ public class RegularPassScheduler {
             }else {
                 if (regularPassService.checkRenew(regularPass) == false) {
                     regularPass.setRenewPair(false);
+                    regularPass.setStatusNow(false);
                     regularPassService.updateRegularPass(regularPass, regularPass.getId());
                 }
             }
