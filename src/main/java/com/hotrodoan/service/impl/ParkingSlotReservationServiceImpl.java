@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,6 +64,12 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
 
     @Override
     public void deleteParkingSlotReservation(Long id) {
+        ParkingSlotReservation parkingSlotReservation = parkingSlotReservationRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
+        LocalDate bookingDate = parkingSlotReservation.getBookingDate().toLocalDate();
+        LocalDate today = LocalDate.now();
+        if (bookingDate.isBefore(today)) {
+            throw new RuntimeException("Cannot delete past reservation");
+        }
         parkingSlotReservationRepository.deleteById(id);
     }
 

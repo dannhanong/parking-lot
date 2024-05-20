@@ -2,6 +2,7 @@ package com.hotrodoan.controller;
 
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
+import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.*;
@@ -127,9 +128,9 @@ public class ParkingSlotReservationController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<?> deleteParkingSlotReservation(@PathVariable Long id) {
+    public ResponseEntity<ResponseMessage> deleteParkingSlotReservation(@PathVariable Long id) {
         parkingSlotReservationService.deleteParkingSlotReservation(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(new ResponseMessage("Deleted Success"), HttpStatus.OK);
     }
 
     @GetMapping("/admin/{id}")
