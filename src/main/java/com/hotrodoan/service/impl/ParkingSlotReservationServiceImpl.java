@@ -2,6 +2,7 @@ package com.hotrodoan.service.impl;
 
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
+import com.hotrodoan.model.dto.ParkingSlotReservationSub;
 import com.hotrodoan.repository.ParkingSlotReservationRepository;
 import com.hotrodoan.service.BlockService;
 import com.hotrodoan.service.ParkingLotService;
@@ -146,5 +147,21 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     @Override
     public List<ParkingSlotReservation> getAllParkingSlotReservations() {
         return parkingSlotReservationRepository.findAll();
+    }
+
+    @Override
+    public ParkingSlotReservation createParkingSlotReservationBySub(ParkingSlotReservationSub parkingSlotReservationSub) {
+        ParkingSlotReservation parkingSlotReservation = new ParkingSlotReservation();
+        parkingSlotReservation.setCustomer(parkingSlotReservationSub.getCustomer());
+        parkingSlotReservation.setStartTimestamp(parkingSlotReservationSub.getStartTimestamp());
+        parkingSlotReservation.setDurationInMinutes(parkingSlotReservationSub.getDurationInMinutes());
+        parkingSlotReservation.setBookingDate(parkingSlotReservationSub.getBookingDate());
+        parkingSlotReservation.setParkingSlot(parkingSlotReservationSub.getParkingSlot());
+        parkingSlotReservation.setCost(parkingSlotReservationSub.getCost());
+        parkingSlotReservation.setConfirmName(parkingSlotReservationSub.getConfirmName());
+        parkingSlotReservation.setPhoneNumber(parkingSlotReservationSub.getPhoneNumber());
+        parkingSlotReservation.setConfirmVehicleNumber(parkingSlotReservationSub.getConfirmVehicleNumber());
+        parkingSlotReservation.setPair(parkingSlotReservationSub.isPair());
+        return parkingSlotReservationRepository.save(parkingSlotReservation);
     }
 }

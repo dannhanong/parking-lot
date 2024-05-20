@@ -3,10 +3,9 @@ package com.hotrodoan.controller;
 import com.hotrodoan.model.ParkingSlotReservation;
 import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.VnPayPayment;
-import com.hotrodoan.service.ParkingSlotReservationService;
-import com.hotrodoan.service.RegularPassService;
-import com.hotrodoan.service.VNPayService;
-import com.hotrodoan.service.VnPayPaymentService;
+import com.hotrodoan.model.dto.ParkingSlotReservationSub;
+import com.hotrodoan.model.dto.RegularPassSub;
+import com.hotrodoan.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +29,10 @@ public class VNPayController {
     private RegularPassService regularPassService;
     @Autowired
     private ParkingSlotReservationService parkingSlotReservationService;
+    @Autowired
+    private ParkingSlotReservationSubService parkingSlotReservationSubService;
+    @Autowired
+    private RegularPassSubService regularPassSubService;
 
 //    @Autowired
 //    private Member_PackageService member_packageService;
@@ -89,21 +92,23 @@ public class VNPayController {
             if (orderInfo.contains("thu2")){
                 String idBookingStr = orderInfo.replace("thu2", "");
                 Long idBooking = Long.parseLong(idBookingStr);
-                ParkingSlotReservation parkingSlotReservation = parkingSlotReservationService.getParkingSlotReservation(idBooking);
-                parkingSlotReservation.setPair(true);
-                parkingSlotReservationService.updateParkingSlotReservation(parkingSlotReservation, idBooking);
-            }else{
-                RegularPass regularPass = regularPassService.getRegularPass(Long.parseLong(orderInfo));
-                if (regularPass.isPair()){
-                    regularPass.setRenewPair(true);
-                }else {
-                    regularPass.setRenewPair(true);
-                    regularPass.setPair(true);
-                }
-                regularPassService.updateRegularPass(regularPass, regularPass.getId());
+                ParkingSlotReservationSub parkingSlotReservationSub = parkingSlotReservationSubService.getParkingSlotReservationSub(idBooking);
+                parkingSlotReservationSub.setPair(true);
+                parkingSlotReservationService.createParkingSlotReservationBySub(parkingSlotReservationSub);
+                parkingSlotReservationSubService.deleteParkingSlotReservationSub(idBooking);
+            } else if (orderInfo.contains("upd")) {
+                String idRegularPassStr = orderInfo.replace("upd", "");
+                Long idRegularPass = Long.parseLong(idRegularPassStr);
+                RegularPass regularPass = regularPassService.getRegularPass(idRegularPass);
+                regularPass.setRenewPair(true);
+            } else{
+                RegularPassSub regularPassSub = regularPassSubService.getRegularPassSub(Long.parseLong(orderInfo));
+                regularPassSub.setPair(true);
+                regularPassSub.setRenewPair(true);
+                regularPassService.createRegularPassBySub(regularPassSub);
+                regularPassSubService.deleteRegularPassSub(Long.parseLong(orderInfo));
             }
             return "ordersuccess";
-            // response.put("status", "success");
         }else
             return "orderfail";
     }

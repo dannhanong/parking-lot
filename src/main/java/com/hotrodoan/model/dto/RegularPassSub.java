@@ -1,19 +1,16 @@
-package com.hotrodoan.model;
+package com.hotrodoan.model.dto;
 
+import com.hotrodoan.model.Customer;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.sql.Date;
-import java.util.Calendar;
 
 @Entity
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class RegularPass {
+public class RegularPassSub {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -2,6 +2,7 @@ package com.hotrodoan.service.impl;
 
 import com.hotrodoan.model.Customer;
 import com.hotrodoan.model.RegularPass;
+import com.hotrodoan.model.dto.RegularPassSub;
 import com.hotrodoan.repository.RegularPassRepository;
 import com.hotrodoan.service.RegularPassService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,5 +81,20 @@ public class RegularPassServiceImpl implements RegularPassService {
     @Override
     public List<RegularPass> getAllRegularPass() {
         return regularPassRepository.findAll();
+    }
+
+    @Override
+    public RegularPass createRegularPassBySub(RegularPassSub regularPassSub) {
+        RegularPass regularPass = new RegularPass();
+        regularPass.setCustomer(regularPassSub.getCustomer());
+        regularPass.setPurchaseDate(regularPassSub.getPurchaseDate());
+        regularPass.setStartDate(regularPassSub.getStartDate());
+        regularPass.setEndDate(regularPassSub.getEndDate());
+        regularPass.setDurationInDays(regularPassSub.getDurationInDays());
+        regularPass.setCost(regularPassSub.getCost());
+        regularPass.setPair(regularPassSub.isPair());
+        regularPass.setRenewPair(regularPassSub.isRenewPair());
+        regularPass.setStatusNow(regularPassSub.isStatusNow());
+        return regularPassRepository.save(regularPass);
     }
 }

@@ -2,6 +2,7 @@ package com.hotrodoan.service;
 
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
+import com.hotrodoan.model.dto.ParkingSlotReservationSub;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,4 +23,5 @@ public interface ParkingSlotReservationService {
     List<AvailableParkingSlotsInfo> findAvailableParkingSlotsAndBlockAndParkingLot(Timestamp startTimestamp, int durationInMinutes, Long id);
     List<ParkingSlotReservation> findPastReservations();
     List<ParkingSlotReservation> getAllParkingSlotReservations();
+    ParkingSlotReservation createParkingSlotReservationBySub(ParkingSlotReservationSub parkingSlotReservationSub);
 }

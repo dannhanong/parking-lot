@@ -3,14 +3,12 @@ package com.hotrodoan.controller;
 import com.hotrodoan.model.Customer;
 import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.User;
+import com.hotrodoan.model.dto.RegularPassSub;
 import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.model.dto.VNPayMessage;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
-import com.hotrodoan.service.CustomerService;
-import com.hotrodoan.service.RegularPassService;
-import com.hotrodoan.service.UserService;
-import com.hotrodoan.service.VNPayService;
+import com.hotrodoan.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
@@ -43,6 +41,8 @@ public class RegularPassController {
     private CustomerService customerService;
     @Autowired
     private VNPayService vnPayService;
+    @Autowired
+    private RegularPassSubService regularPassSubService;
 
     @GetMapping("/admin")
     public ResponseEntity<Page<RegularPass>> getAllRegularPass(@RequestParam(defaultValue = "") String name,
@@ -86,9 +86,11 @@ public class RegularPassController {
         int totalPrice = 5000*regularPass.getDurationInDays();
         int duration = regularPass.getDurationInDays();
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
 
-        String vnpayUrl = vnPayService.createOrder(totalPrice, newRegularPass.getId().toString(), baseUrl);
+        RegularPassSub regularPassSub = regularPassSubService.createRegularPassSub(regularPass);
+//        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
+
+        String vnpayUrl = vnPayService.createOrder(totalPrice, regularPassSub.getId().toString(), baseUrl);
 
         VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
         return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
@@ -121,7 +123,7 @@ public class RegularPassController {
             RegularPass updatedRegularPass = regularPassService.updateRegularPass(regularPass, r.getId());
 
             String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-            String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString(), baseUrl);
+            String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString()+"upd", baseUrl);
             //        return new ResponseEntity<>(regularPassService.updateRegularPass(regularPass, r.getId()), HttpStatus.OK);
             VNPayMessage VNPayMessage = new VNPayMessage("payment for renew", vnpayUrl);
             return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
@@ -133,7 +135,7 @@ public class RegularPassController {
                 regularPass.setPurchaseDate(new Date(System.currentTimeMillis()));
                 RegularPass updatedRegularPass = regularPassService.updateRegularPass(regularPass, r.getId());
                 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-                String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString(), baseUrl);
+                String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString()+"upd", baseUrl);
                 VNPayMessage VNPayMessage = new VNPayMessage("payment for renew", vnpayUrl);
                 return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
             }

@@ -2,6 +2,7 @@ package com.hotrodoan.controller;
 
 import com.hotrodoan.model.*;
 import com.hotrodoan.model.dto.AvailableParkingSlotsInfo;
+import com.hotrodoan.model.dto.ParkingSlotReservationSub;
 import com.hotrodoan.model.dto.ResponseMessage;
 import com.hotrodoan.model.dto.VNPayMessage;
 import com.hotrodoan.security.jwt.JwtProvider;
@@ -50,6 +51,8 @@ public class ParkingSlotReservationController {
     private RegularPassService regularPassService;
     @Autowired
     private VNPayService vnPayService;
+    @Autowired
+    private ParkingSlotReservationSubService parkingSlotReservationSubService;
 
     @GetMapping("/admin")
     public ResponseEntity<Page<ParkingSlotReservation>> getAllParkingSlotReservations(@RequestParam(defaultValue = "") String dateStr,
@@ -102,15 +105,18 @@ public class ParkingSlotReservationController {
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer = customerService.getCustomerByUser(user);
         parkingSlotReservation.setCustomer(customer);
+        parkingSlotReservation.setBookingDate(Timestamp.valueOf(LocalDateTime.now()));
+
         int cost = 500 * parkingSlotReservation.getDurationInMinutes();
         RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
-        if (regularPass != null || (regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) && regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now())))){
+        if (regularPass != null && regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) && regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now()))){
             parkingSlotReservation.setCost(0);
         } else {
             parkingSlotReservation.setCost(cost);
         }
-        ParkingSlotReservation newParkingSlotReservation = parkingSlotReservationService.createParkingSlotReservation(parkingSlotReservation);
+//        ParkingSlotReservation newParkingSlotReservation = parkingSlotReservationService.createParkingSlotReservation(parkingSlotReservation);
 
+        ParkingSlotReservationSub parkingSlotReservationSub = parkingSlotReservationSubService.createParkingSlotReservationSub(parkingSlotReservation);
         ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
 
         if(parkingSlot.isSlotAvailable() == false) {
@@ -125,13 +131,13 @@ public class ParkingSlotReservationController {
             if (parkingSlotReservation.getCost() > 0){
                 String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 
-                String vnpayUrl = vnPayService.createOrder(parkingSlotReservation.getCost(), newParkingSlotReservation.getId().toString()+"thu2", baseUrl);
+                String vnpayUrl = vnPayService.createOrder(parkingSlotReservationSub.getCost(), parkingSlotReservationSub.getId().toString()+"thu2", baseUrl);
 
                 VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
                 return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
             }else {
-                newParkingSlotReservation.setPair(true);
-                parkingSlotReservationService.updateParkingSlotReservation(newParkingSlotReservation, newParkingSlotReservation.getId());
+                parkingSlotReservationSub.setPair(true);
+                parkingSlotReservationSubService.updateParkingSlotReservationSub(parkingSlotReservationSub, parkingSlotReservationSub.getId());
                 return new ResponseEntity<>(new VNPayMessage("no-payment", "free"), HttpStatus.OK);
             }
         }     

@@ -22,17 +22,14 @@ public class RegularPassScheduler {
         List<RegularPass> regularPasses = regularPassService.getAllRegularPass();
 
         for (RegularPass regularPass : regularPasses) {
-            if (regularPass.isPair() == false){
-                regularPassService.deleteRegularPass(regularPass.getId());
-            }else {
-                if (regularPassService.checkRenew(regularPass) == false) {
-                    regularPass.setRenewPair(false);
-                    regularPass.setStatusNow(false);
-                    regularPassService.updateRegularPass(regularPass, regularPass.getId());
-                }
-            }
-            if (regularPass.getStartDate().before(new Date(System.currentTimeMillis()))){
+            if (regularPass.getStartDate().equals(new Date(System.currentTimeMillis())) || regularPass.getStartDate().before(new Date(System.currentTimeMillis()))){
                 regularPass.setStatusNow(true);
+                regularPassService.updateRegularPass(regularPass, regularPass.getId());
+            }
+
+            if (regularPassService.checkRenew(regularPass) == false) {
+                regularPass.setRenewPair(false);
+                regularPass.setStatusNow(false);
                 regularPassService.updateRegularPass(regularPass, regularPass.getId());
             }
         }
