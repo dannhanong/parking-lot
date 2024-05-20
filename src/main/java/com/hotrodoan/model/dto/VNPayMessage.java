@@ -10,6 +10,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VNPayMessage {
     private String message;
-    private RegularPass regularPass;
     private String vnpayUrl;
 }

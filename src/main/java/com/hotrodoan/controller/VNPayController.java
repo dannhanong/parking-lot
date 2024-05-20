@@ -18,7 +18,7 @@ import java.util.Date;
 @RestController
 @CrossOrigin(origins = "*")
 //@org.springframework.stereotype.Controller
-public class Controller {
+public class VNPayController {
     @Autowired
     private VNPayService vnPayService;
 
@@ -37,17 +37,17 @@ public class Controller {
         return "index";
     }
 
-    @PostMapping("/submitOrder")
-    public String submidOrder(@RequestParam("amount") int orderTotal,
-                              @RequestParam("orderInfo") String orderInfo,
-                              HttpServletRequest request){
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl);
-        return "redirect:" + vnpayUrl;
-    }
+//    @PostMapping("/submitOrder")
+//    public String submidOrder(@RequestParam("amount") int orderTotal,
+//                              @RequestParam("orderInfo") String orderInfo,
+//                              HttpServletRequest request){
+//        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+//        String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl);
+//        return "redirect:" + vnpayUrl;
+//    }
 
     @GetMapping("/vnpay-payment")
-    public String GetMapping(HttpServletRequest request, Model model, HttpSession session){
+    public String returnPayment(HttpServletRequest request, Model model, HttpSession session){
         int paymentStatus =vnPayService.orderReturn(request);
 
 //        Object obj = request.getSession().getAttribute("m_p");
@@ -80,13 +80,18 @@ public class Controller {
         }
 
         if (paymentStatus == 1){
-            RegularPass regularPass = (RegularPass) session.getAttribute("regularPass");
-            regularPassService.addRegularPass(regularPass);
+            RegularPass regularPass = regularPassService.getRegularPass(Long.parseLong(orderInfo));
+            if (regularPass.isPair()){
+                regularPass.setRenewPair(true);
+            }else {
+                regularPass.setRenewPair(true);
+                regularPass.setPair(true);
+            }
+
+            regularPassService.updateRegularPass(regularPass, regularPass.getId());
             return "ordersuccess";
             // response.put("status", "success");
         }else
             return "orderfail";
-
-//        return paymentStatus == 1 ? "ordersuccess" : "orderfail";
     }
 }

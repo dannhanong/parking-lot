@@ -26,4 +26,6 @@ public class RegularPass implements Serializable {
     private Date endDate;
     private int durationInDays;
     private int cost;
+    private boolean pair = false;
+    private boolean renewPair = false;
 }

@@ -13,7 +13,6 @@ import org.springframework.web.filter.CorsFilter;
 @SpringBootApplication
 //@EnableScheduling
 public class ParkingLotApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(ParkingLotApplication.class, args);
 	}

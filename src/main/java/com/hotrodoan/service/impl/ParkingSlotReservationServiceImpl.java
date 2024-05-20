@@ -8,7 +8,6 @@ import com.hotrodoan.service.ParkingLotService;
 import com.hotrodoan.service.ParkingSlotReservationService;
 import com.hotrodoan.service.ParkingSlotService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.ansi.Ansi8BitColor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,8 +15,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +40,9 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
 
     @Override
     public ParkingSlotReservation createParkingSlotReservation(ParkingSlotReservation parkingSlotReservation) {
-        parkingSlotReservation.setBookingDate(new Date(System.currentTimeMillis()));
+        // Timestamp now = new Timestamp(System.currentTimeMillis());
+        Timestamp now = Timestamp.from(Instant.now());
+        parkingSlotReservation.setBookingDate(now);
         return parkingSlotReservationRepository.save(parkingSlotReservation);
     }
 
@@ -58,6 +59,9 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
             ps.setBookingDate(parkingSlotReservation.getBookingDate());
             ps.setParkingSlot(parkingSlotReservation.getParkingSlot());
             ps.setCost(parkingSlotReservation.getCost());
+            ps.setConfirmName(parkingSlotReservation.getConfirmName());
+            ps.setPhoneNumber(parkingSlotReservation.getPhoneNumber());
+            ps.setConfirmVehicleNumber(parkingSlotReservation.getConfirmVehicleNumber());
             return parkingSlotReservationRepository.save(ps);
         }).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
     }
@@ -65,12 +69,15 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     @Override
     public void deleteParkingSlotReservation(Long id) {
         ParkingSlotReservation parkingSlotReservation = parkingSlotReservationRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
-        LocalDate bookingDate = parkingSlotReservation.getBookingDate().toLocalDate();
-        LocalDate today = LocalDate.now();
-        if (bookingDate.isBefore(today)) {
-            throw new RuntimeException("Cannot delete past reservation");
+        LocalDateTime bookingDateTime = parkingSlotReservation.getBookingDate().toLocalDateTime();
+        LocalDateTime today = LocalDateTime.now();
+
+        if (ChronoUnit.HOURS.between(today, bookingDateTime) > 1) {
+            throw new RuntimeException("Cannot delete reservation 1 hour before booking time");
         }
-        parkingSlotReservationRepository.deleteById(id);
+        else {
+            parkingSlotReservationRepository.deleteById(id);
+        }
     }
 
     @Override

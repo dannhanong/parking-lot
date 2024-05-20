@@ -15,4 +15,6 @@ public interface RegularPassService {
     RegularPass updateRegularPass(RegularPass regularPass, Long id);
     RegularPass getRegularByCustomer(Customer customer);
     Page<RegularPass> getByCustomerName(String name, Pageable pageable);
+    boolean checkRenew(RegularPass regularPass);
+    List<RegularPass> getAllRegularPass();
 }

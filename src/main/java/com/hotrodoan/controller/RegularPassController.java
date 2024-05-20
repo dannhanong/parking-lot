@@ -77,7 +77,7 @@ public class RegularPassController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<VNPayMessage> addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
+    public ResponseEntity<VNPayMessage> addRegularPass(HttpServletRequest request, @RequestBody RegularPass regularPass) {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -86,31 +86,22 @@ public class RegularPassController {
         int totalPrice = 5000*regularPass.getDurationInDays();
         int duration = regularPass.getDurationInDays();
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        // String baseUrl = "";
-        String vnpayUrl = vnPayService.createOrder(totalPrice, "Pay for "+duration+" day", baseUrl);
-        session.setAttribute("regularPass", regularPass);
-        // regularPassService.addRegularPass(regularPass);
-//        return new ResponseEntity<>(regularPassService.addRegularPass(regularPass), HttpStatus.CREATED);
-//        return new ResponseEntity<>(vnpayUrl, HttpStatus.OK);
-        // return new ResponseEntity<>(session.getAttribute("regularPass"), HttpStatus.OK);
-        RedirectView redirectView = new RedirectView(vnpayUrl);
+        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
 
-//        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
+        String vnpayUrl = vnPayService.createOrder(totalPrice, newRegularPass.getId().toString(), baseUrl);
 
-        VNPayMessage VNPayMessage = new VNPayMessage("payment", regularPass, vnpayUrl);
-        return new ResponseEntity<>(VNPayMessage, HttpStatus.CREATED);
-//        return new RedirectView(vnpayUrl);
+        VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
+        return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
     }
 
     @PutMapping("renew")
-    public String renewRegularPass(HttpServletRequest request, @RequestBody RegularPass regularPass) {
+    public ResponseEntity<VNPayMessage> renewRegularPass(HttpServletRequest request, @RequestBody RegularPass regularPass) {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer = customerService.getCustomerByUser(user);
         RegularPass r = regularPassService.getRegularByCustomer(customer);
 
-//        String vnpayUrl = "";
         if (r.getEndDate().after(regularPass.getStartDate())) {
             int totalPrice = 5000 * regularPass.getDurationInDays();
             int duration = regularPass.getDurationInDays();
@@ -127,14 +118,28 @@ public class RegularPassController {
             regularPass.setPurchaseDate(new Date(System.currentTimeMillis()));
             regularPass.setCost(5000 * regularPass.getDurationInDays());
 
+            RegularPass updatedRegularPass = regularPassService.updateRegularPass(regularPass, r.getId());
+
             String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-            String vnpayUrl = vnPayService.createOrder(totalPrice, "Pay for " + duration + " day", baseUrl);
+            String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString(), baseUrl);
             //        return new ResponseEntity<>(regularPassService.updateRegularPass(regularPass, r.getId()), HttpStatus.OK);
-            return vnpayUrl;
+            VNPayMessage VNPayMessage = new VNPayMessage("payment for renew", vnpayUrl);
+            return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
         }
         else {
-            return new ResponseMessage("Cannot renew before the end date of the current pass").getMessage();
+            if (r.getEndDate().before(regularPass.getStartDate()) && regularPass.getStartDate().after(new Date(System.currentTimeMillis()))) {
+                int totalPrice = 5000 * regularPass.getDurationInDays();
+                r.setCost(totalPrice);
+                regularPass.setPurchaseDate(new Date(System.currentTimeMillis()));
+                RegularPass updatedRegularPass = regularPassService.updateRegularPass(regularPass, r.getId());
+                String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+                String vnpayUrl = vnPayService.createOrder(totalPrice, updatedRegularPass.getId().toString(), baseUrl);
+                VNPayMessage VNPayMessage = new VNPayMessage("payment for renew", vnpayUrl);
+                return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
+            }
+            else {
+                throw new RuntimeException("Your card is still valid and the months you entered are not consecutive");
+            }
         }
-
     }
 }

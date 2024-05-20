@@ -22,7 +22,7 @@ public class ParkingSlotReservation {
 
     private Timestamp startTimestamp;
     private int durationInMinutes;
-    private Date bookingDate;
+    private Timestamp bookingDate;
 
     @ManyToOne
     private ParkingSlot parkingSlot;

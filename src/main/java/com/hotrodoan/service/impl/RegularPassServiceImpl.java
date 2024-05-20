@@ -52,6 +52,8 @@ public class RegularPassServiceImpl implements RegularPassService {
             r.setEndDate(regularPass.getEndDate());
             r.setDurationInDays(regularPass.getDurationInDays());
             r.setCost(regularPass.getCost());
+            r.setPair(regularPass.isPair());
+            r.setRenewPair(regularPass.isRenewPair());
             return regularPassRepository.save(r);
         }).orElseThrow(() -> new RuntimeException("Regular pass not found"));
     }
@@ -64,5 +66,18 @@ public class RegularPassServiceImpl implements RegularPassService {
     @Override
     public Page<RegularPass> getByCustomerName(String name, Pageable pageable) {
         return regularPassRepository.searchByCustomerName(name, pageable);
+    }
+
+    @Override
+    public boolean checkRenew(RegularPass regularPass) {
+        Date currentDate = new Date(System.currentTimeMillis());
+        if(regularPass.getEndDate().before(currentDate))
+            return false;
+        return true;
+    }
+
+    @Override
+    public List<RegularPass> getAllRegularPass() {
+        return regularPassRepository.findAll();
     }
 }
