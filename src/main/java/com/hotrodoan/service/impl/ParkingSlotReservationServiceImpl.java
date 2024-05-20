@@ -68,16 +68,7 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
 
     @Override
     public void deleteParkingSlotReservation(Long id) {
-        ParkingSlotReservation parkingSlotReservation = parkingSlotReservationRepository.findById(id).orElseThrow(() -> new RuntimeException("Not found parking slot reservation"));
-        LocalDateTime bookingDateTime = parkingSlotReservation.getBookingDate().toLocalDateTime();
-        LocalDateTime today = LocalDateTime.now();
-
-        if (ChronoUnit.HOURS.between(today, bookingDateTime) > 1) {
-            throw new RuntimeException("Cannot delete reservation 1 hour before booking time");
-        }
-        else {
-            parkingSlotReservationRepository.deleteById(id);
-        }
+        parkingSlotReservationRepository.deleteById(id);
     }
 
     @Override

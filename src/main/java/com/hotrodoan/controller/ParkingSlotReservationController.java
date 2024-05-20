@@ -20,6 +20,9 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.Calendar;
 import java.util.List;
 
 @RestController
@@ -129,8 +132,23 @@ public class ParkingSlotReservationController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<ResponseMessage> deleteParkingSlotReservation(@PathVariable Long id) {
-        parkingSlotReservationService.deleteParkingSlotReservation(id);
-        return new ResponseEntity<>(new ResponseMessage("Deleted Success"), HttpStatus.OK);
+        ParkingSlotReservation parkingSlotReservation = parkingSlotReservationService.getParkingSlotReservation(id);
+        Timestamp bookingDateTime = parkingSlotReservation.getBookingDate();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(bookingDateTime);
+        cal2.setTime(now);
+        long hoursBetween = Math.abs(cal1.getTimeInMillis() - cal2.getTimeInMillis()) / (60 * 60 * 1000);
+
+        if (hoursBetween > 1) {
+            return new ResponseEntity<>(new ResponseMessage("Cannot delete booking > 1 hour"), HttpStatus.BAD_REQUEST);
+        }
+        else {
+            parkingSlotReservationService.deleteParkingSlotReservation(id);
+            return new ResponseEntity<>(new ResponseMessage("Deleted Success"), HttpStatus.OK);
+        }
     }
 
     @GetMapping("/admin/{id}")
