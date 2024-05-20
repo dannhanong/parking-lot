@@ -95,9 +95,9 @@ public class RegularPassController {
         // return new ResponseEntity<>(session.getAttribute("regularPass"), HttpStatus.OK);
         RedirectView redirectView = new RedirectView(vnpayUrl);
 
-        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
+//        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
 
-        VNPayMessage VNPayMessage = new VNPayMessage("success", vnpayUrl);
+        VNPayMessage VNPayMessage = new VNPayMessage("payment", regularPass, vnpayUrl);
         return new ResponseEntity<>(VNPayMessage, HttpStatus.CREATED);
 //        return new RedirectView(vnpayUrl);
     }
