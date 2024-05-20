@@ -54,6 +54,7 @@ public class RegularPassServiceImpl implements RegularPassService {
             r.setCost(regularPass.getCost());
             r.setPair(regularPass.isPair());
             r.setRenewPair(regularPass.isRenewPair());
+            r.setStatusNow(regularPass.isStatusNow());
             return regularPassRepository.save(r);
         }).orElseThrow(() -> new RuntimeException("Regular pass not found"));
     }

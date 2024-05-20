@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.sql.Date;
 import java.util.List;
 
 @Component
@@ -28,6 +29,10 @@ public class RegularPassScheduler {
                     regularPass.setRenewPair(false);
                     regularPassService.updateRegularPass(regularPass, regularPass.getId());
                 }
+            }
+            if (regularPass.getStartDate().before(new Date(System.currentTimeMillis()))){
+                regularPass.setStatusNow(true);
+                regularPassService.updateRegularPass(regularPass, regularPass.getId());
             }
         }
     }

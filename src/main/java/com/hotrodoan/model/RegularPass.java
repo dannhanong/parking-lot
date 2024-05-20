@@ -28,4 +28,5 @@ public class RegularPass implements Serializable {
     private int cost;
     private boolean pair = false;
     private boolean renewPair = false;
+    private boolean statusNow = false;
 }
