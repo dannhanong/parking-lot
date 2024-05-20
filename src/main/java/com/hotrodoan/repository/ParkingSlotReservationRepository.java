@@ -17,7 +17,7 @@ import java.util.List;
 public interface ParkingSlotReservationRepository extends JpaRepository<ParkingSlotReservation, Long> {
     Page<ParkingSlotReservation> findAll(Pageable pageable);
     Page<ParkingSlotReservation> findByBookingDate(Date date, Pageable pageable);
-    Page<ParkingSlotReservation> findByCustomerAndBookingDate(Customer customer, Date date, Pageable pageable);
+    Page<ParkingSlotReservation> findByCustomer(Customer customer, Pageable pageable);
     List<ParkingSlotReservation> findByParkingSlot(ParkingSlot parkingSlot);
     @Query(value = "SELECT * FROM ParkingSlotReservation r WHERE DATE_ADD(r.startTimestamp, INTERVAL r.durationInMinutes MINUTE) < CURRENT_TIMESTAMP", nativeQuery = true)
     List<ParkingSlotReservation> findPastReservations();

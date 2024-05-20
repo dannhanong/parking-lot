@@ -83,6 +83,7 @@ public class Controller {
             RegularPass regularPass = (RegularPass) session.getAttribute("regularPass");
             regularPassService.addRegularPass(regularPass);
             return "ordersuccess";
+            // response.put("status", "success");
         }else
             return "orderfail";
 

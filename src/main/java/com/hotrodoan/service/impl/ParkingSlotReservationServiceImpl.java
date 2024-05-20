@@ -72,8 +72,8 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     }
 
     @Override
-    public Page<ParkingSlotReservation> getAllParkingSlotReservationsByCustomer(Customer customer, Date date, Pageable pageable) {
-        return parkingSlotReservationRepository.findByCustomerAndBookingDate(customer, date, pageable);
+    public Page<ParkingSlotReservation> getAllParkingSlotReservationsByCustomer(Customer customer, Pageable pageable) {
+        return parkingSlotReservationRepository.findByCustomer(customer, pageable);
     }
 
     @Override

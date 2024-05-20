@@ -108,6 +108,8 @@ public class ParkingLotController {
 
         List<BlockAndParkingSlot> blockAndParkingSlots = pAndBForm.getBlockAndParkingSlots();
         List<BlockAndParkingSlot> newBlockAndParkingSlots = parkingLotAndBlockForm.getBlockAndParkingSlots();
+
+        //bug
         if (blockAndParkingSlots.size() > newBlockAndParkingSlots.size()) {
             for (int i = newBlockAndParkingSlots.size(); i < blockAndParkingSlots.size(); i++) {
                 blockService.deleteBlock(blockAndParkingSlots.get(i).getBlock().getId());
@@ -120,6 +122,7 @@ public class ParkingLotController {
             }
 
         }
+        
         else if (blockAndParkingSlots.size() == newBlockAndParkingSlots.size()) {
             for(int i=0; i< newBlockAndParkingSlots.size(); i++){
                 Block bl = blockAndParkingSlots.get(i).getBlock();
@@ -152,7 +155,8 @@ public class ParkingLotController {
                 Block bl = new Block();
                 bl.setBlockCode(blockAndParkingSlot.getBlock().getBlockCode());
                 bl.setParkingLot(updateP);
-                int dParkingSlot = 0;
+                int dParkingSlot = newBlockAndParkingSlots.get(i).getNumberOfParkingSlots();
+
                 Block newBlock = blockService.createBlock(bl);
 
                 int numberOfSlots = blockAndParkingSlot.getNumberOfParkingSlots();
@@ -164,7 +168,30 @@ public class ParkingLotController {
                     parkingSlotService.addParkingSlot(parkingSlot);
                 }
                 newBlock.setNumberOfParkingSlots(dParkingSlot);
-                blockService.updateBlock(newBlock, newBlock.getId());
+
+                for(int j=0; j< newBlockAndParkingSlots.size(); j++){
+                    Block blck = blockAndParkingSlots.get(j).getBlock();
+                    blck.setBlockCode(newBlockAndParkingSlots.get(i).getBlock().getBlockCode());
+    
+                    blck.setNumberOfParkingSlots(dParkingSlot);
+    
+                    Block updateBlock = blockService.updateBlock(blck, blck.getId());
+    
+                     if (dParkingSlot < blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
+                        for (int k = dParkingSlot; k < blockAndParkingSlots.get(i).getNumberOfParkingSlots(); k++) {
+                            ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlock(k+1, blck.getId());
+                            parkingSlotService.deleteParkingSlot(parkingSlot.getId());
+                        }
+                    } else if (dParkingSlot > blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
+                        int maxOfSlotNumber = parkingSlotService.findMaxSlotNumber(updateBlock.getId());
+                        for (int k = maxOfSlotNumber; k < dParkingSlot; k++) {
+                            ParkingSlot parkingSlot = new ParkingSlot();
+                            parkingSlot.setBlock(updateBlock);
+                            parkingSlot.setSlotNumber(k + 1);
+                            parkingSlotService.addParkingSlot(parkingSlot);
+                        }
+                    }
+                }
             }
         }
 

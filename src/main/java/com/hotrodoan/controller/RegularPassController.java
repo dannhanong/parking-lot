@@ -76,7 +76,7 @@ public class RegularPassController {
     }
 
     @PostMapping("/add")
-    public RedirectView addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
+    public ResponseEntity<RegularPass> addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -85,11 +85,19 @@ public class RegularPassController {
         int totalPrice = 5000*regularPass.getDurationInDays();
         int duration = regularPass.getDurationInDays();
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+        // String baseUrl = "";
         String vnpayUrl = vnPayService.createOrder(totalPrice, "Pay for "+duration+" day", baseUrl);
         session.setAttribute("regularPass", regularPass);
         // regularPassService.addRegularPass(regularPass);
 //        return new ResponseEntity<>(regularPassService.addRegularPass(regularPass), HttpStatus.CREATED);
-        return new RedirectView(vnpayUrl);
+//        return new ResponseEntity<>(vnpayUrl, HttpStatus.OK);
+        // return new ResponseEntity<>(session.getAttribute("regularPass"), HttpStatus.OK);
+        RedirectView redirectView = new RedirectView(vnpayUrl);
+
+        RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
+
+        return new ResponseEntity<>(newRegularPass, HttpStatus.CREATED);
+//        return new RedirectView(vnpayUrl);
     }
 
     @PutMapping("renew")

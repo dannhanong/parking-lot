@@ -68,7 +68,6 @@ public class ParkingSlotReservationController {
 
     @GetMapping("/show")
     public ResponseEntity<Page<ParkingSlotReservation>> showParkingSlotReservations(HttpServletRequest request,
-                                                                                    @RequestParam(defaultValue = "")Date date,
                                                                                     @RequestParam(defaultValue = "0") int page,
                                                                                     @RequestParam(defaultValue = "10") int size,
                                                                                     @RequestParam(defaultValue = "id") String sortBy,
@@ -78,7 +77,7 @@ public class ParkingSlotReservationController {
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer = customerService.getCustomerByUser(user);
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortBy)));
-        return new ResponseEntity<>(parkingSlotReservationService.getAllParkingSlotReservationsByCustomer(customer, date, pageable), HttpStatus.OK);
+        return new ResponseEntity<>(parkingSlotReservationService.getAllParkingSlotReservationsByCustomer(customer, pageable), HttpStatus.OK);
     }
 
     @GetMapping("/add")

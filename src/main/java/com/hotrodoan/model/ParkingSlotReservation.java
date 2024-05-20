@@ -28,4 +28,10 @@ public class ParkingSlotReservation {
     private ParkingSlot parkingSlot;
 
     private int cost;
+    @Column(nullable = false)
+    private String cofirmName;
+    @Column(nullable = false)
+    private String phoneNumber;
+    @Column(nullable = false)
+    private String confirmVehicleNumber;
 }

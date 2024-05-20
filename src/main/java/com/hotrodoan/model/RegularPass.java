@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.Calendar;
 
@@ -12,7 +13,7 @@ import java.util.Calendar;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegularPass {
+public class RegularPass implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
