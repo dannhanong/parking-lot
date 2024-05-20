@@ -135,7 +135,7 @@ public class ParkingLotController {
 
                 if (dParkingSlot < blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
                     for (int j = dParkingSlot; j < blockAndParkingSlots.get(i).getNumberOfParkingSlots(); j++) {
-                        ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlock(j+1, updateBlock.getId());
+                        ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlockId(j+1, updateBlock.getId());
                         parkingSlotService.deleteParkingSlot(parkingSlot.getId());
                     }
                 } else if (dParkingSlot > blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
@@ -179,7 +179,7 @@ public class ParkingLotController {
     
                      if (dParkingSlot < blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {
                         for (int k = dParkingSlot; k < blockAndParkingSlots.get(i).getNumberOfParkingSlots(); k++) {
-                            ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlock(k+1, blck.getId());
+                            ParkingSlot parkingSlot = parkingSlotService.getParkingSlotBySlotNumberAndBlock(k+1, blck);
                             parkingSlotService.deleteParkingSlot(parkingSlot.getId());
                         }
                     } else if (dParkingSlot > blockAndParkingSlots.get(i).getNumberOfParkingSlots()) {

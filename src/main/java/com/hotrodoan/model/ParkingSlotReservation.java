@@ -29,7 +29,7 @@ public class ParkingSlotReservation {
 
     private int cost;
     @Column(nullable = false)
-    private String cofirmName;
+    private String confirmName;
     @Column(nullable = false)
     private String phoneNumber;
     @Column(nullable = false)

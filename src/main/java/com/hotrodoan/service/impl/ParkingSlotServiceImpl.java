@@ -82,7 +82,12 @@ public class ParkingSlotServiceImpl implements ParkingSlotService {
     }
 
     @Override
-    public ParkingSlot getParkingSlotBySlotNumberAndBlock(int slotNumber, Long blockId) {
+    public ParkingSlot getParkingSlotBySlotNumberAndBlockId(int slotNumber, Long blockId) {
         return parkingSlotRepository.findBySlotNumberAndBlockId(slotNumber, blockId);
+    }
+
+    @Override
+    public ParkingSlot getParkingSlotBySlotNumberAndBlock(int slotNumber, Block block) {
+        return parkingSlotRepository.findBySlotNumberAndBlock(slotNumber, block);
     }
 }

@@ -29,4 +29,5 @@ public interface ParkingSlotRepository extends JpaRepository<ParkingSlot, Long>{
     int countByBlock(Block block);
     @Query("SELECT ps FROM ParkingSlot ps WHERE ps.slotNumber = :slotNumber AND ps.block.id = :blockId")
     ParkingSlot findBySlotNumberAndBlockId(int slotNumber, Long blockId);
+    ParkingSlot findBySlotNumberAndBlock(int slotNumber, Block block);
 }

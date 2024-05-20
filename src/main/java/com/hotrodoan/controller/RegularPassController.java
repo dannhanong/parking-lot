@@ -4,6 +4,7 @@ import com.hotrodoan.model.Customer;
 import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.User;
 import com.hotrodoan.model.dto.ResponseMessage;
+import com.hotrodoan.model.dto.VNPayMessage;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.CustomerService;
@@ -76,7 +77,7 @@ public class RegularPassController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<RegularPass> addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
+    public ResponseEntity<VNPayMessage> addRegularPass(HttpServletRequest request, HttpSession session, @RequestBody RegularPass regularPass) {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
@@ -96,7 +97,8 @@ public class RegularPassController {
 
         RegularPass newRegularPass = regularPassService.addRegularPass(regularPass);
 
-        return new ResponseEntity<>(newRegularPass, HttpStatus.CREATED);
+        VNPayMessage VNPayMessage = new VNPayMessage("success", vnpayUrl);
+        return new ResponseEntity<>(VNPayMessage, HttpStatus.CREATED);
 //        return new RedirectView(vnpayUrl);
     }
 
