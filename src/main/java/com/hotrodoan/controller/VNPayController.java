@@ -10,6 +10,7 @@ import com.hotrodoan.service.VnPayPaymentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-@RestController
+@Controller
 @CrossOrigin(origins = "*")
 //@org.springframework.stereotype.Controller
 public class VNPayController {
@@ -61,6 +62,9 @@ public class VNPayController {
         String paymentTime = request.getParameter("vnp_PayDate");
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalPrice = request.getParameter("vnp_Amount");
+        int totalPriceInt = Integer.parseInt(totalPrice);
+        totalPriceInt = totalPriceInt / 100;
+        totalPrice = String.valueOf(totalPriceInt);
 
         model.addAttribute("orderId", orderInfo);
         model.addAttribute("totalPrice", totalPrice);

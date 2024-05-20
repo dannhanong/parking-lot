@@ -30,6 +30,7 @@ public class BookingScheduler {
     public void addHistoryFromBooking() {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         List<ParkingSlotReservation> expiredBookings = parkingSlotReservationService.findPastReservations();
+        List<ParkingSlotReservation> bookingsToCancel = parkingSlotReservationService.getAllParkingSlotReservations();
         List<ParkingSlot> parkingSlotsToUpdate = new ArrayList<>();
         List<BookingHistory> historiesToAdd = new ArrayList<>();
         for (ParkingSlotReservation booking : expiredBookings) {
@@ -38,48 +39,23 @@ public class BookingScheduler {
             parkingSlot.setSlotAvailable(true);
             parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
 
-            BookingHistory history = new BookingHistory();
-            history.setCustomer(booking.getCustomer());
-            history.setStartTimestamp(booking.getStartTimestamp());
-            history.setDurationInMinutes(booking.getDurationInMinutes());
-            history.setBookingDate(booking.getBookingDate());
-            history.setParkingSlot(booking.getParkingSlot());
-            history.setCost(booking.getCost());
+            if (booking.isPair() == true){
+                BookingHistory history = new BookingHistory();
+                history.setCustomer(booking.getCustomer());
+                history.setStartTimestamp(booking.getStartTimestamp());
+                history.setDurationInMinutes(booking.getDurationInMinutes());
+                history.setBookingDate(booking.getBookingDate());
+                history.setParkingSlot(booking.getParkingSlot());
+                history.setCost(booking.getCost());
 
-            bookingHistoryService.addBookingHistory(history);
-            parkingSlotReservationService.deleteParkingSlotReservation(booking.getId());
+                bookingHistoryService.addBookingHistory(history);
+                parkingSlotReservationService.deleteParkingSlotReservation(booking.getId());
+            }
+        }
+        for (ParkingSlotReservation booking : bookingsToCancel) {
+            if (booking.isPair() == false) {
+                parkingSlotReservationService.deleteParkingSlotReservation(booking.getId());
+            }
         }
     }
-
-//    @Scheduled(fixedRate = 60000)
-//    public void addHistoryFromBooking() {
-//        Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-//        List<ParkingSlotReservation> expiredBookings = parkingSlotReservationService.findPastReservations();
-//        List<ParkingSlot> parkingSlotsToUpdate = new ArrayList<>();
-//        List<BookingHistory> historiesToAdd = new ArrayList<>();
-//
-//        for (ParkingSlotReservation booking : expiredBookings) {
-//            ParkingSlip parkingSlip = parkingSlipService.getParkingSlipByParkingSlotReservation(booking);
-//
-//            Long parkingSlotId = booking.getParkingSlot().getId();
-//            ParkingSlot parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
-//            parkingSlot.setSlotAvailable(true);
-//            parkingSlotsToUpdate.add(parkingSlot);
-//
-//            BookingHistory history = new BookingHistory();
-//            history.setCustomer(booking.getCustomer());
-//            history.setStartTimestamp(booking.getStartTimestamp());
-//            history.setDurationInMinutes(booking.getDurationInMinutes());
-//            history.setBookingDate(booking.getBookingDate());
-//            history.setParkingSlot(booking.getParkingSlot());
-//            history.setActualEntryTime(parkingSlip.getActualEntryTime());
-//            history.setActualExitTime(parkingSlip.getActualExitTime());
-//            history.setBasicCost(parkingSlip.getBasicCost());
-//            history.setPenalty(parkingSlip.getPenalty());
-//            historiesToAdd.add(history);
-//        }
-//
-//        parkingSlotService.updateParkingSlots(parkingSlotsToUpdate);
-//        bookingHistoryService.addBookingHistories(historiesToAdd);
-//    }
 }

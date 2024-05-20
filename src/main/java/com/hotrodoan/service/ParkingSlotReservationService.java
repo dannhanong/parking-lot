@@ -21,4 +21,5 @@ public interface ParkingSlotReservationService {
     List<ParkingSlotReservation> getParkingSlotReservationsByParkingSlot(ParkingSlot parkingSlot);
     List<AvailableParkingSlotsInfo> findAvailableParkingSlotsAndBlockAndParkingLot(Timestamp startTimestamp, int durationInMinutes, Long id);
     List<ParkingSlotReservation> findPastReservations();
+    List<ParkingSlotReservation> getAllParkingSlotReservations();
 }

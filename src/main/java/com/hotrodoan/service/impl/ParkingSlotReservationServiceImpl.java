@@ -142,4 +142,9 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
 
         return pastReservations;
     }
+
+    @Override
+    public List<ParkingSlotReservation> getAllParkingSlotReservations() {
+        return parkingSlotReservationRepository.findAll();
+    }
 }
