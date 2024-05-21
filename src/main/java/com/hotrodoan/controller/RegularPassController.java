@@ -83,8 +83,18 @@ public class RegularPassController {
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer = customerService.getCustomerByUser(user);
         regularPass.setCustomer(customer);
-        int totalPrice = 5000*regularPass.getDurationInDays();
         int duration = regularPass.getDurationInDays();
+        int totalPrice = 5000*duration;
+        regularPass.setCost(totalPrice);
+
+        Date startDate = regularPass.getStartDate();
+        int durationInDays = regularPass.getDurationInDays();
+        Calendar c = Calendar.getInstance();
+        c.setTime(startDate);
+        c.add(Calendar.DATE, durationInDays);
+        Date endDate = new Date(c.getTimeInMillis());
+        regularPass.setEndDate(endDate);
+
         String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 
         RegularPassSub regularPassSub = regularPassSubService.createRegularPassSub(regularPass);

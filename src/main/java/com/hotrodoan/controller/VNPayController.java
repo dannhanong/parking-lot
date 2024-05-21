@@ -103,6 +103,7 @@ public class VNPayController {
                 regularPass.setRenewPair(true);
             } else{
                 RegularPassSub regularPassSub = regularPassSubService.getRegularPassSub(Long.parseLong(orderInfo));
+                regularPassSub.setPurchaseDate(new java.sql.Date(System.currentTimeMillis()));
                 regularPassSub.setPair(true);
                 regularPassSub.setRenewPair(true);
                 regularPassService.createRegularPassBySub(regularPassSub);
