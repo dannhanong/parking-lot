@@ -107,7 +107,7 @@ public class ParkingSlotReservationController {
         parkingSlotReservation.setCustomer(customer);
         parkingSlotReservation.setBookingDate(Timestamp.valueOf(LocalDateTime.now()));
 
-        int cost = 500 * parkingSlotReservation.getDurationInMinutes();
+        int cost = (20000/60) * parkingSlotReservation.getDurationInMinutes();
         RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
         if (regularPass != null && regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) && regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now()))){
             parkingSlotReservation.setCost(0);
