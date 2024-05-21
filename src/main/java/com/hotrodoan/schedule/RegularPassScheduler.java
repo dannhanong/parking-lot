@@ -21,13 +21,14 @@ public class RegularPassScheduler {
     public void checkNewAndResetRenew() {
         List<RegularPass> regularPasses = regularPassService.getAllRegularPass();
 
+        Date today = new Date(System.currentTimeMillis());
         for (RegularPass regularPass : regularPasses) {
-            if (regularPass.getStartDate().equals(new Date(System.currentTimeMillis())) || regularPass.getStartDate().before(new Date(System.currentTimeMillis()))){
+            if (regularPass.getStartDate().equals(today) || regularPass.getStartDate().before(today)) {
                 regularPass.setStatusNow(true);
                 regularPassService.updateRegularPass(regularPass, regularPass.getId());
             }
 
-            if (regularPassService.checkRenew(regularPass) == false) {
+            if (!regularPassService.checkRenew(regularPass)) {
                 regularPass.setRenewPair(false);
                 regularPass.setStatusNow(false);
                 regularPassService.updateRegularPass(regularPass, regularPass.getId());
