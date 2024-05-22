@@ -65,6 +65,7 @@ public class VNPayController {
         String paymentTime = request.getParameter("vnp_PayDate");
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalPrice = request.getParameter("vnp_Amount");
+
         int totalPriceInt = Integer.parseInt(totalPrice);
         totalPriceInt = totalPriceInt / 100;
         totalPrice = String.valueOf(totalPriceInt);
