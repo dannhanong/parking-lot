@@ -133,7 +133,6 @@ public class ParkingSlotReservationServiceImpl implements ParkingSlotReservation
     @Override
     public List<ParkingSlotReservation> findPastReservations() {
         List<ParkingSlotReservation> allReservations = parkingSlotReservationRepository.findAll();
-
         // Lọc ra những đặt chỗ đã kết thúc
         List<ParkingSlotReservation> pastReservations = allReservations.stream()
                 .filter(reservation -> reservation.getStartTimestamp().toInstant()
