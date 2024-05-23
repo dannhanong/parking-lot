@@ -1,5 +1,6 @@
 package com.hotrodoan.controller;
 
+import com.hotrodoan.model.ParkingSlot;
 import com.hotrodoan.model.ParkingSlotReservation;
 import com.hotrodoan.model.RegularPass;
 import com.hotrodoan.model.VnPayPayment;
@@ -33,6 +34,8 @@ public class VNPayController {
     private ParkingSlotReservationSubService parkingSlotReservationSubService;
     @Autowired
     private RegularPassSubService regularPassSubService;
+    @Autowired
+    private ParkingSlotService parkingSlotService;
 
 //    @Autowired
 //    private Member_PackageService member_packageService;
@@ -97,6 +100,9 @@ public class VNPayController {
                 parkingSlotReservationSub.setPair(true);
                 parkingSlotReservationService.createParkingSlotReservationBySub(parkingSlotReservationSub);
                 parkingSlotReservationSubService.deleteParkingSlotReservationSub(idBooking);
+                ParkingSlot parkingSlot = parkingSlotReservationSub.getParkingSlot();
+                parkingSlot.setSlotAvailable(false);
+                parkingSlotService.updateParkingSlot(parkingSlot, parkingSlot.getId());
             } else if (orderInfo.contains("upd")) {
                 String idRegularPassStr = orderInfo.replace("upd", "");
                 Long idRegularPass = Long.parseLong(idRegularPassStr);
