@@ -23,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -93,6 +94,7 @@ public class AuthController {
         userService.save(user);
         Customer customer = new Customer();
         customer.setUser(user);
+        customer.setRegistrationDate(new Date(System.currentTimeMillis()));
         customerService.addCustomer(customer);
         return new ResponseEntity<>(new ResponseMessage("create_success"), HttpStatus.OK);
     }
