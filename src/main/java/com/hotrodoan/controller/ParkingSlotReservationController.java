@@ -138,6 +138,7 @@ public class ParkingSlotReservationController {
             }else {
                 parkingSlotReservationSub.setPair(true);
                 parkingSlotReservationSubService.updateParkingSlotReservationSub(parkingSlotReservationSub, parkingSlotReservationSub.getId());
+                ParkingSlotReservation newParkingSlotReservation1 = parkingSlotReservationService.createParkingSlotReservationBySub(parkingSlotReservationSub);
                 return new ResponseEntity<>(new VNPayMessage("no-payment", "free"), HttpStatus.OK);
             }
         }     
