@@ -59,13 +59,18 @@ public class CustomerController {
 //        return new ResponseEntity<>(customerService.updateCustomer(customer1, customer1.getId()), HttpStatus.OK);
 //    }
 
+    @PutMapping("/admin/update/{id}")
+    public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer, @PathVariable Long id) {
+        return ResponseEntity.ok(customerService.updateCustomer(customer, id));
+    }
+
     @DeleteMapping("admin/delete/{id}")
     public ResponseEntity<?> deleteCustomer(@PathVariable("id") Long id) {
         customerService.deleteCustomer(id);
         return new ResponseEntity<>(new ResponseMessage("deleted"), HttpStatus.OK);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/admin/{id}")
     public ResponseEntity<Customer> getCustomer(@PathVariable("id") Long id) {
         return new ResponseEntity<>(customerService.getCustomer(id), HttpStatus.OK);
     }

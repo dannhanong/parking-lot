@@ -95,6 +95,9 @@ public class ParkingSlotReservationController {
                                                                                       @RequestParam("durationInMinutes") int durationInMinutes,
                                                                                       @RequestParam("id") Long id) {
         Timestamp startTimestamp = Timestamp.valueOf(startTimestampStr);
+        if (startTimestamp.before(Timestamp.valueOf(LocalDateTime.now()))) {
+            throw new RuntimeException("Time in future");
+        }
         return new ResponseEntity<>(parkingSlotReservationService.findAvailableParkingSlotsAndBlockAndParkingLot(startTimestamp, durationInMinutes, id), HttpStatus.OK);
     }
 
@@ -107,38 +110,49 @@ public class ParkingSlotReservationController {
         parkingSlotReservation.setCustomer(customer);
         parkingSlotReservation.setBookingDate(Timestamp.valueOf(LocalDateTime.now()));
 
-        int cost = (20000/60) * parkingSlotReservation.getDurationInMinutes();
-        RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
-        if (regularPass != null && regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) && regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now()))){
-            parkingSlotReservation.setCost(0);
-        } else {
-            parkingSlotReservation.setCost(cost);
+        Timestamp startTimestamp = parkingSlotReservation.getStartTimestamp();
+        if (startTimestamp.before(Timestamp.valueOf(LocalDateTime.now()))) {
+            throw new RuntimeException("Time in future");
         }
+        else {
+            RegularPass regularPass = regularPassService.getRegularByCustomer(customer);
+            if (regularPass != null && regularPass.getStartDate().before(Timestamp.valueOf(LocalDateTime.now())) && regularPass.getEndDate().after(Timestamp.valueOf(LocalDateTime.now()))){
+                parkingSlotReservation.setCost(0);
+            } else {
+                if (parkingSlotReservation.getDurationInMinutes() <= 60) {
+                    parkingSlotReservation.setCost(20000);
+                }
+                else {
+                    int cost = 20000 + (parkingSlotReservation.getDurationInMinutes() - 60)*(20000/60);
+                    parkingSlotReservation.setCost(cost);
+                }
+            }
 //        ParkingSlotReservation newParkingSlotReservation = parkingSlotReservationService.createParkingSlotReservation(parkingSlotReservation);
 
-        ParkingSlotReservationSub parkingSlotReservationSub = parkingSlotReservationSubService.createParkingSlotReservationSub(parkingSlotReservation);
-        ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
-        if(parkingSlot.isSlotAvailable() == false) {
-            throw new RuntimeException("Parking slot is not available");
-        }else{
-            Long parkingSlotId = parkingSlot.getId();
-            parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
+            ParkingSlotReservationSub parkingSlotReservationSub = parkingSlotReservationSubService.createParkingSlotReservationSub(parkingSlotReservation);
+            ParkingSlot parkingSlot = parkingSlotReservation.getParkingSlot();
+            if(parkingSlot.isSlotAvailable() == false) {
+                throw new RuntimeException("Parking slot is not available");
+            }else{
+                Long parkingSlotId = parkingSlot.getId();
+                parkingSlot = parkingSlotService.getParkingSlot(parkingSlotId);
 //            return new ResponseEntity<>(newParkingSlotReservation, HttpStatus.OK);
 
-            if (parkingSlotReservation.getCost() > 0){
-                String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-                String vnpayUrl = vnPayService.createOrder(parkingSlotReservationSub.getCost(), parkingSlotReservationSub.getId().toString()+"thu2", baseUrl);
-                VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
-                return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
-            }else {
-                parkingSlotReservationSub.setPair(true);
-                parkingSlotReservationSubService.updateParkingSlotReservationSub(parkingSlotReservationSub, parkingSlotReservationSub.getId());
-                ParkingSlotReservation newParkingSlotReservation1 = parkingSlotReservationService.createParkingSlotReservationBySub(parkingSlotReservationSub);
-                parkingSlot.setSlotAvailable(false);
-                parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
-                return new ResponseEntity<>(new VNPayMessage("no-payment", "free"), HttpStatus.OK);
+                if (parkingSlotReservation.getCost() > 0){
+                    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+                    String vnpayUrl = vnPayService.createOrder(parkingSlotReservationSub.getCost(), parkingSlotReservationSub.getId().toString()+"thu2", baseUrl);
+                    VNPayMessage VNPayMessage = new VNPayMessage("payment", vnpayUrl);
+                    return new ResponseEntity<>(VNPayMessage, HttpStatus.OK);
+                }else {
+                    parkingSlotReservationSub.setPair(true);
+                    parkingSlotReservationSubService.updateParkingSlotReservationSub(parkingSlotReservationSub, parkingSlotReservationSub.getId());
+                    ParkingSlotReservation newParkingSlotReservation1 = parkingSlotReservationService.createParkingSlotReservationBySub(parkingSlotReservationSub);
+                    parkingSlot.setSlotAvailable(false);
+                    parkingSlotService.updateParkingSlot(parkingSlot, parkingSlotId);
+                    return new ResponseEntity<>(new VNPayMessage("no-payment", "free"), HttpStatus.OK);
+                }
             }
-        }     
+        }
     }
 
     public boolean isParkingSlotAvailable(ParkingSlot parkingSlot) {
