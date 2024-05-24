@@ -1,18 +1,28 @@
 package com.hotrodoan.controller;
 
 import com.hotrodoan.model.Customer;
+import com.hotrodoan.model.Image;
 import com.hotrodoan.model.User;
 import com.hotrodoan.model.dto.ParkingLotAndBlockForm;
 import com.hotrodoan.model.dto.UpdateProfileForm;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.CustomerService;
+import com.hotrodoan.service.ImageService;
 import com.hotrodoan.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.util.Base64;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @RestController
 @RequestMapping("/profile")
@@ -26,6 +36,8 @@ public class ProfileController {
     private JwtProvider jwtProvider;
     @Autowired
     private JwtTokenFilter jwtTokenFilter;
+    @Autowired
+    private ImageService imageService;
 
     @GetMapping("")
     public ResponseEntity<UpdateProfileForm> getCustomer(HttpServletRequest request) {
@@ -45,22 +57,54 @@ public class ProfileController {
         return new ResponseEntity(updateProfileForm, HttpStatus.OK);
     }
 
-    @PutMapping("/update")
-    public ResponseEntity<UpdateProfileForm> updateCustomer(HttpServletRequest request, @RequestBody UpdateProfileForm updateProfileForm) {
+    @GetMapping("/avatar")
+    public ResponseEntity<Resource> viewImage(HttpServletRequest request) throws Exception {
         String token = jwtTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(username).orElseThrow(() -> new RuntimeException("User not found"));
+        Image image = user.getImage();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(image.getFileType()))
+                .body(new ByteArrayResource(image.getData()));
+    }
+
+    @PutMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> updateCustomer(HttpServletRequest request,
+                                            @RequestParam("name") String name,
+//                                            @RequestParam("username") String username,
+//                                            @RequestParam("email") String email,
+                                            @RequestParam("contactNumber") String contactNumber,
+                                            @RequestParam("vehicleNumber") String vehicleNumber,
+                                            @RequestParam("file")MultipartFile file) throws Exception {
+        String token = jwtTokenFilter.getJwt(request);
+        String usname = jwtProvider.getUsernameFromToken(token);
+        User user = userService.findByUsername(usname).orElseThrow(() -> new RuntimeException("User not found"));
         Customer customer1 = customerService.getCustomerByUser(user);
 
-        user.setName(updateProfileForm.getName());
-        user.setEmail(updateProfileForm.getEmail());
-        user.setAvatar(updateProfileForm.getAvatar());
+        user.setName(name);
+//        user.setUsername(username);
+//        user.setEmail(email);
+        customer1.setContactNumber(contactNumber);
+        customer1.setVehicleNumber(vehicleNumber);
+//        user.setEmail(updateProfileForm.getEmail());
+//        user.setAvatar(updateProfileForm.getAvatar());
+//
+//        customer1.setVehicleNumber(updateProfileForm.getVehicleNumber());
+//        customer1.setContactNumber(updateProfileForm.getContactNumber());
 
-        customer1.setVehicleNumber(updateProfileForm.getVehicleNumber());
-        customer1.setContactNumber(updateProfileForm.getContactNumber());
+        String oldImageId = user.getImage().getId();
+        String downloadUrl = "";
+        Image image = imageService.saveImage(file);
+
+        user.setImage(image);
+        downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/download/")
+                .path(image.getId())
+                .toUriString();
 
         userService.save(user);
+        imageService.deleteImage(oldImageId);
         customerService.updateCustomer(customer1, customer1.getId());
-        return new ResponseEntity<>(updateProfileForm, HttpStatus.OK);
+        return new ResponseEntity<>(name, HttpStatus.OK);
     }
 }

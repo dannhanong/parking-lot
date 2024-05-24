@@ -60,6 +60,7 @@ public class UserServiceImpl implements UserService {
             u.setUsername(user.getUsername());
             u.setPassword(user.getPassword());
             u.setEmail(user.getEmail());
+            u.setImage(user.getImage());
             return userRepository.save(u);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }

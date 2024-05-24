@@ -26,7 +26,7 @@ public class BookingScheduler {
     @Autowired
     private ParkingSlotService parkingSlotService;
 
-    @Scheduled(fixedRate = 600000)
+    @Scheduled(fixedRate = 60000)
     public void addHistoryFromBooking() {
         Timestamp currentTime = new Timestamp(System.currentTimeMillis());
         List<ParkingSlotReservation> expiredBookings = parkingSlotReservationService.findPastReservations();
