@@ -52,5 +52,16 @@ public class UserServiceImpl implements UserService {
             return userRepository.save(u);
         }).orElseThrow(() -> new RuntimeException("User not found"));
     }
+
+    @Override
+    public User updateUser(User user, Long id) {
+        return userRepository.findById(id).map(u -> {
+            u.setName(user.getName());
+            u.setUsername(user.getUsername());
+            u.setPassword(user.getPassword());
+            u.setEmail(user.getEmail());
+            return userRepository.save(u);
+        }).orElseThrow(() -> new RuntimeException("User not found"));
+    }
 }
 

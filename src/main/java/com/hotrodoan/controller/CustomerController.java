@@ -3,6 +3,7 @@ package com.hotrodoan.controller;
 import com.hotrodoan.model.Customer;
 import com.hotrodoan.model.User;
 import com.hotrodoan.model.dto.ResponseMessage;
+import com.hotrodoan.model.dto.UpdateProfileForm;
 import com.hotrodoan.security.jwt.JwtProvider;
 import com.hotrodoan.security.jwt.JwtTokenFilter;
 import com.hotrodoan.service.CustomerService;
@@ -60,8 +61,18 @@ public class CustomerController {
 //    }
 
     @PutMapping("/admin/update/{id}")
-    public ResponseEntity<Customer> updateCustomer(@RequestBody Customer customer, @PathVariable Long id) {
-        return ResponseEntity.ok(customerService.updateCustomer(customer, id));
+    public ResponseEntity<UpdateProfileForm> updateCustomer(@RequestBody UpdateProfileForm updateProfileForm, @PathVariable Long id) {
+        Customer customer = customerService.getCustomer(id);
+        User user = customer.getUser();
+        user.setName(updateProfileForm.getName());
+        user.setUsername(updateProfileForm.getUsername());
+        user.setEmail(updateProfileForm.getEmail());
+        customer.setContactNumber(updateProfileForm.getContactNumber());
+        customer.setVehicleNumber(updateProfileForm.getVehicleNumber());
+        customer.setRegularCustomer(updateProfileForm.isRegularCustomer());
+        userService.updateUser(user, user.getId());
+        customerService.updateCustomer(customer, id);
+        return new  ResponseEntity(updateProfileForm, HttpStatus.OK);
     }
 
     @DeleteMapping("admin/delete/{id}")
