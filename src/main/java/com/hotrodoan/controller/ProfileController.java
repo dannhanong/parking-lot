@@ -92,15 +92,17 @@ public class ProfileController {
 //        customer1.setVehicleNumber(updateProfileForm.getVehicleNumber());
 //        customer1.setContactNumber(updateProfileForm.getContactNumber());
 
-        String oldImageId = user.getImage().getId();
+        String oldImageId = null;
+        if (user.getImage() != null && !user.getImage().equals("")){
+            oldImageId = user.getImage().getId();
+        }
         String downloadUrl = "";
         Image image = imageService.saveImage(file);
-
         user.setImage(image);
-        downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/download/")
-                .path(image.getId())
-                .toUriString();
+//        downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+//                .path("/download/")
+//                .path(image.getId())
+//                .toUriString();
 
         userService.save(user);
         imageService.deleteImage(oldImageId);
