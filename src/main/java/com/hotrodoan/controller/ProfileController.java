@@ -105,7 +105,9 @@ public class ProfileController {
 //                .toUriString();
 
         userService.save(user);
-        imageService.deleteImage(oldImageId);
+        if (oldImageId != null){
+            imageService.deleteImage(oldImageId);
+        }
         customerService.updateCustomer(customer1, customer1.getId());
         return new ResponseEntity<>(name, HttpStatus.OK);
     }
