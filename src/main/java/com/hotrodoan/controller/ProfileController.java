@@ -75,7 +75,7 @@ public class ProfileController {
 //                                            @RequestParam("email") String email,
                                             @RequestParam("contactNumber") String contactNumber,
                                             @RequestParam("vehicleNumber") String vehicleNumber,
-                                            @RequestParam("file")MultipartFile file) throws Exception {
+                                            @RequestParam(value="file", required=false)MultipartFile file) throws Exception {
         String token = jwtTokenFilter.getJwt(request);
         String usname = jwtProvider.getUsernameFromToken(token);
         User user = userService.findByUsername(usname).orElseThrow(() -> new RuntimeException("User not found"));
@@ -92,21 +92,17 @@ public class ProfileController {
 //        customer1.setVehicleNumber(updateProfileForm.getVehicleNumber());
 //        customer1.setContactNumber(updateProfileForm.getContactNumber());
 
-        String oldImageId = null;
-        if (user.getImage() != null && !user.getImage().equals("")){
-            oldImageId = user.getImage().getId();
-        }
-        String downloadUrl = "";
-        Image image = imageService.saveImage(file);
-        user.setImage(image);
-//        downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
-//                .path("/download/")
-//                .path(image.getId())
-//                .toUriString();
-
-        userService.save(user);
-        if (oldImageId != null){
-            imageService.deleteImage(oldImageId);
+        if (file != null && !file.isEmpty()) {
+            String oldImageId = null;
+            if (user.getImage() != null && !user.getImage().equals("")){
+                oldImageId = user.getImage().getId();
+            }
+            Image image = imageService.saveImage(file);
+            user.setImage(image);
+            userService.save(user);
+            if (oldImageId != null){
+                imageService.deleteImage(oldImageId);
+            }
         }
         customerService.updateCustomer(customer1, customer1.getId());
         return new ResponseEntity<>(name, HttpStatus.OK);
